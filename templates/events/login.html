@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Elite Events</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root { --accent: #c9a84c; --accent-bright: #f0c040; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #0d0c08; font-family: 'Jost', sans-serif; color: #f0ede8; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow-x: hidden; padding: 20px; }
+  .card { width: 420px; max-width: 100%; border: 1px solid #c9a84c; background: linear-gradient(160deg,#1c1606,#0d0c08); padding: 48px 44px; border-radius: 2px; position: relative; }
+  .gold-bar { height: 3px; background: linear-gradient(90deg,#6b4f10,#f0c040,#c9a84c,#f0c040,#6b4f10); margin-bottom: 36px; border-radius: 2px; }
+  .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; letter-spacing: 0.35em; text-transform: uppercase; color: #fff; text-align: center; margin-bottom: 4px; }
+  .logo span { color: var(--accent-bright); }
+  .subtitle { font-size: 0.65rem; letter-spacing: 0.45em; text-transform: uppercase; color: var(--accent); text-align: center; margin-bottom: 36px; }
+  .field-label { font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; display: block; }
+  .field-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #f0ede8; font-family: 'Jost', sans-serif; font-size: 0.88rem; font-weight: 300; padding: 0.65rem 1rem; border-radius: 2px; outline: none; transition: border-color 0.3s, box-shadow 0.3s; margin-bottom: 20px; }
+  .field-input:focus { border-color: var(--accent); box-shadow: 0 0 18px rgba(201,168,76,0.2); }
+  .btn { width: 100%; background: transparent; border: 1.5px solid var(--accent); color: var(--accent-bright); font-family: 'Jost', sans-serif; font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase; font-weight: 400; padding: 0.8rem; cursor: pointer; transition: all 0.4s; border-radius: 2px; position: relative; overflow: hidden; }
+  .btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg,var(--accent),var(--accent-bright)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); z-index: 0; }
+  .btn:hover::before { transform: scaleX(1); }
+  .btn:hover { color: #111; }
+  .btn span { position: relative; z-index: 1; }
+  .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+  .divider-line { flex: 1; height: 1px; background: rgba(201,168,76,0.2); }
+  .divider-text { font-size: 0.65rem; letter-spacing: 0.3em; color: #555; text-transform: uppercase; }
+  .link { color: var(--accent); text-decoration: none; font-size: 0.8rem; letter-spacing: 0.1em; transition: color 0.3s; }
+  .link:hover { color: var(--accent-bright); }
+  .error-msg { background: rgba(224,92,58,0.1); border: 1px solid rgba(224,92,58,0.3); color: #e05c3a; font-size: 0.78rem; padding: 0.6rem 1rem; border-radius: 2px; margin-bottom: 20px; letter-spacing: 0.05em; }
+  .corner-tl { position: absolute; top: 12px; left: 12px; width: 16px; height: 16px; border-top: 1.5px solid var(--accent); border-left: 1.5px solid var(--accent); }
+  .corner-br { position: absolute; bottom: 12px; right: 12px; width: 16px; height: 16px; border-bottom: 1.5px solid var(--accent); border-right: 1.5px solid var(--accent); }
+
+  /* Mobile-only adjustments */
+  @media (max-width: 480px) {
+    body { padding: 16px; align-items: flex-start; padding-top: 40px; }
+    .card { padding: 36px 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  <div class="gold-bar"></div>
+  <p class="logo">Elite <span>Events</span></p>
+  <p class="subtitle">✦ Welcome Back ✦</p>
+
+  {% if form.errors %}
+  <div class="error-msg">Invalid username or password. Please try again.</div>
+  {% endif %}
+
+  <form method="POST">
+    {% csrf_token %}
+    <label class="field-label">Email</label>
+    <input class="field-input" type="email" name="email" placeholder="Enter your email" required>
+    <label class="field-label">Password</label>
+    <input class="field-input" type="password" name="password" placeholder="Enter your password" required>    
+    <button type="submit" class="btn"><span>Sign In</span></button>
+  </form>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <span class="divider-text">or</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <p style="text-align:center;font-size:0.8rem;color:#888;">Don't have an account?
+    <a href="{% url 'register' %}" class="link"> Register here</a>
+  </p>
+</div>
+</body>
+</html>

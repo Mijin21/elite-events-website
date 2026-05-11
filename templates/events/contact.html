@@ -1,0 +1,759 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Elite Events – Contact</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --accent: #c9a84c;
+    --accent-bright: #f0c040;
+    --accent2: #7b61ff;
+    --glass-border: rgba(201,168,76,0.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%; width: 100%;
+    background: #111010;
+    font-family: 'Jost', sans-serif;
+    color: #f0ede8;
+  }
+
+  /* Desktop: overflow hidden for fixed viewport feel */
+  @media (min-width: 769px) {
+    html, body { overflow: hidden; }
+  }
+  /* Mobile: allow scroll */
+  @media (max-width: 768px) {
+    html, body { overflow-x: hidden; overflow-y: auto; }
+  }
+
+  body { cursor: none; }
+  /* Hide custom cursor on touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    body { cursor: auto; }
+    #cursor, #cursor-dot { display: none; }
+  }
+
+  #cursor {
+    position: fixed; top: 0; left: 0; z-index: 9999;
+    width: 22px; height: 22px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease;
+    mix-blend-mode: screen;
+  }
+  #cursor-dot {
+    position: fixed; top: 0; left: 0; z-index: 9999;
+    width: 5px; height: 5px;
+    background: var(--accent-bright);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+    background-size: 55px 55px;
+    pointer-events: none;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  .fade-in { animation: fadeIn 0.9s cubic-bezier(0.22,1,0.36,1) both; }
+  .fade-in-d1 { animation-delay: 0.1s; }
+  .fade-in-d2 { animation-delay: 0.22s; }
+
+  .logo-mark { font-family: 'Cormorant Garamond', serif; font-weight: 300; font-size: 1.4rem; letter-spacing: 0.22em; text-transform: uppercase; color: #fff; }
+  .logo-mark span { color: var(--accent-bright); }
+  .logo-icon {
+    width: 36px; height: 36px; border: 1.5px solid var(--accent); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 600;
+    color: var(--accent-bright); margin-right: 10px;
+    box-shadow: 0 0 14px rgba(201,168,76,0.25);
+  }
+
+  #hamburger-btn { cursor: pointer; }
+  .ham-line { display: block; width: 24px; height: 1.5px; background: #d0ccc4; margin: 5px 0; transition: all 0.35s cubic-bezier(0.22,1,0.36,1); }
+  #hamburger-btn:hover .ham-line { background: var(--accent-bright); }
+
+  #nav-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: #0a0a0a;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.5s cubic-bezier(0.22,1,0.36,1);
+  }
+  #nav-overlay.open { opacity: 1; pointer-events: all; }
+  .nav-link {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 5vw, 4.5rem); font-weight: 300;
+    letter-spacing: 0.15em; color: #555; text-transform: uppercase;
+    text-decoration: none; line-height: 1.5; display: block;
+    transition: color 0.3s, letter-spacing 0.4s; position: relative;
+    opacity: 0; transform: translateY(20px);
+  }
+  .nav-link::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 0; height: 1px; background: var(--accent); transition: width 0.4s cubic-bezier(0.22,1,0.36,1); }
+  .nav-link:hover { color: #fff; letter-spacing: 0.22em; }
+  .nav-link:hover::after { width: 100%; }
+  .nav-link.active-link { color: var(--accent-bright); }
+  #nav-overlay.open .nav-link { opacity: 1; transform: none; }
+  #nav-overlay.open .nav-link:nth-child(1) { transition: color 0.3s,letter-spacing 0.4s,opacity 0.5s 0.10s,transform 0.5s 0.10s; }
+  #nav-overlay.open .nav-link:nth-child(2) { transition: color 0.3s,letter-spacing 0.4s,opacity 0.5s 0.18s,transform 0.5s 0.18s; }
+  #nav-overlay.open .nav-link:nth-child(3) { transition: color 0.3s,letter-spacing 0.4s,opacity 0.5s 0.26s,transform 0.5s 0.26s; }
+  #nav-overlay.open .nav-link:nth-child(4) { transition: color 0.3s,letter-spacing 0.4s,opacity 0.5s 0.34s,transform 0.5s 0.34s; }
+  #nav-overlay.open .nav-link:nth-child(5) { transition: color 0.3s,letter-spacing 0.4s,opacity 0.5s 0.42s,transform 0.5s 0.42s; }
+  #close-btn {
+    position: absolute; top: 2rem; right: 2.5rem;
+    width: 48px; height: 48px; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: border-color 0.3s, transform 0.4s; color: #e8e8e8;
+  }
+  #close-btn:hover { border-color: var(--accent); color: var(--accent); transform: rotate(90deg); }
+
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 3.5vw, 3.2rem); font-weight: 300; letter-spacing: 0.05em; line-height: 1.15; color: #fff; }
+  .section-title .accent { color: var(--accent-bright); font-style: italic; }
+  .subtitle { font-size: 0.72rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--accent); font-weight: 300; }
+
+  /* FOR ENQUIRY — big, gold, glowing, with lines */
+  .enquiry-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--accent-bright);
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 12px;
+    text-shadow: 0 0 22px rgba(240,192,64,0.7), 0 0 50px rgba(240,192,64,0.25);
+  }
+  .enquiry-label::before {
+    content: ''; flex: 0 0 40px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(240,192,64,0.6));
+  }
+  .enquiry-label::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(240,192,64,0.6), transparent);
+  }
+
+  .form-field {
+    width: 100%; background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(255,255,255,0.13);
+    color: #f0ede8; font-family: 'Jost', sans-serif;
+    font-size: 0.84rem; font-weight: 300; letter-spacing: 0.06em;
+    padding: 0.65rem 1rem; border-radius: 2px; outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+  }
+  .form-field::placeholder { color: rgba(240,237,232,0.3); }
+  .form-field:focus { border-color: var(--accent); background: rgba(201,168,76,0.07); box-shadow: 0 0 22px rgba(201,168,76,0.2); }
+  textarea.form-field { resize: none; }
+
+  .submit-btn {
+    position: relative; background: transparent;
+    border: 1.5px solid var(--accent); color: var(--accent-bright);
+    font-family: 'Jost', sans-serif; font-size: 0.75rem; letter-spacing: 0.3em;
+    text-transform: uppercase; font-weight: 400; padding: 0.75rem 2.5rem;
+    cursor: pointer; overflow: hidden; transition: color 0.4s, box-shadow 0.4s; border-radius: 2px;
+  }
+  .submit-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); z-index: 0;
+  }
+  .submit-btn:hover::before { transform: scaleX(1); }
+  .submit-btn:hover { color: #111; box-shadow: 0 0 38px rgba(201,168,76,0.55); }
+  .submit-btn span { position: relative; z-index: 1; }
+
+  .info-card {
+    position: relative;
+    background: linear-gradient(135deg, rgba(201,168,76,0.09) 0%, rgba(123,97,255,0.07) 60%, rgba(0,0,0,0.2) 100%);
+    border: 1px solid var(--glass-border); border-radius: 4px;
+    backdrop-filter: blur(16px); overflow: hidden; height: 100%;
+  }
+  .info-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 15% 15%, rgba(201,168,76,0.16) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 85%, rgba(123,97,255,0.09) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  .info-card::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c9a84c' fill-opacity='0.045'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .info-item { display: flex; align-items: flex-start; gap: 1rem; padding: 0.8rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; z-index: 1; transition: transform 0.3s; }
+  .info-item:last-child { border-bottom: none; }
+  .info-item:hover { transform: translateX(6px); }
+  .info-icon { width: 36px; height: 36px; min-width: 36px; border: 1px solid var(--glass-border); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-bright); background: rgba(201,168,76,0.09); transition: box-shadow 0.3s, background 0.3s; }
+  .info-item:hover .info-icon { box-shadow: 0 0 18px rgba(201,168,76,0.45); background: rgba(201,168,76,0.16); }
+  .info-label { font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent); font-weight: 300; margin-bottom: 2px; }
+  .info-value { font-size: 0.82rem; color: rgba(240,237,232,0.88); font-weight: 300; letter-spacing: 0.05em; }
+  .corner-tl, .corner-br { position: absolute; width: 28px; height: 28px; z-index: 2; }
+  .corner-tl { top: 14px; left: 14px; border-top: 1.5px solid var(--accent); border-left: 1.5px solid var(--accent); }
+  .corner-br { bottom: 14px; right: 14px; border-bottom: 1.5px solid var(--accent); border-right: 1.5px solid var(--accent); }
+
+  /* ============ DOVE SCENE ============ */
+  #dove-scene {
+    position: fixed; inset: 0; z-index: 800;
+    pointer-events: none; overflow: hidden;
+    display: none;
+  }
+
+  /* The whole dove+envelope unit */
+  #dove-unit {
+    position: absolute;
+    left: -180px;
+    bottom: 32%;
+    width: 180px;
+    will-change: transform;
+  }
+
+  /* Envelope swing below dove via CSS */
+  #env-hang {
+    animation: env-sway 0.55s ease-in-out infinite alternate;
+    transform-origin: 90px 0;
+  }
+  @keyframes env-sway {
+    from { transform: rotate(-5deg) translateY(0px); }
+    to   { transform: rotate(5deg) translateY(3px); }
+  }
+
+  /* Wing flap */
+  .wing-up {
+    transform-origin: 90px 70px;
+    animation: wflap-up 0.32s ease-in-out infinite alternate;
+  }
+  .wing-dn {
+    transform-origin: 90px 70px;
+    animation: wflap-dn 0.32s ease-in-out infinite alternate;
+  }
+  @keyframes wflap-up { from { transform: scaleY(1) rotate(0deg); } to { transform: scaleY(0.3) rotate(-5deg); } }
+  @keyframes wflap-dn { from { transform: scaleY(1) rotate(0deg); } to { transform: scaleY(0.3) rotate(5deg); } }
+
+  /* Dove flight via JS requestAnimationFrame */
+
+  /* Sparkle particles */
+  .sparkle {
+    position: absolute; border-radius: 50%;
+    background: var(--accent-bright);
+    pointer-events: none;
+    animation: sp 0.9s ease-out forwards;
+  }
+  @keyframes sp {
+    0%   { transform: translate(0,0) scale(0); opacity: 1; }
+    100% { transform: translate(var(--sx), var(--sy)) scale(1); opacity: 0; }
+  }
+
+  /* Trail dots */
+  .trail-dot {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle, rgba(240,192,64,0.6), transparent);
+    pointer-events: none;
+    animation: trail-fade 0.8s ease-out forwards;
+  }
+  @keyframes trail-fade { from { opacity: 0.7; transform: scale(1); } to { opacity: 0; transform: scale(2); } }
+
+  #success-msg {
+    position: fixed; bottom: 2.8rem; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: rgba(201,168,76,0.1); border: 1px solid var(--accent);
+    color: var(--accent-bright); font-family: 'Jost', sans-serif;
+    font-size: 0.76rem; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 0.8rem 2.2rem; border-radius: 2px; backdrop-filter: blur(8px);
+    opacity: 0; transition: opacity 0.5s, transform 0.5s; z-index: 900;
+    white-space: nowrap;
+    box-shadow: 0 0 30px rgba(201,168,76,0.2);
+  }
+  /* On mobile, make success msg fit screen */
+  @media (max-width: 480px) {
+    #success-msg {
+      white-space: normal;
+      text-align: center;
+      width: 90%;
+      font-size: 0.68rem;
+      padding: 0.7rem 1.2rem;
+    }
+  }
+  #success-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .glow-orb { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; opacity: 0.1; }
+
+  /* ============================
+     MOBILE RESPONSIVE OVERRIDES
+     ============================ */
+  @media (max-width: 768px) {
+    /* Page wrapper: allow natural height and scrolling */
+    .page-wrap {
+      height: auto !important;
+      overflow: visible !important;
+      min-height: 100vh;
+    }
+
+    /* Header: reduce horizontal padding */
+    .page-header {
+      padding: 1rem 1.2rem !important;
+    }
+
+    /* Logo mark: slightly smaller on mobile */
+    .logo-mark {
+      font-size: 1.1rem;
+      letter-spacing: 0.14em;
+    }
+
+    /* Main content: reduce padding on mobile */
+    .page-main {
+      padding: 0 1.2rem 2rem !important;
+      overflow: visible !important;
+    }
+
+    /* Page title section */
+    .page-title-section {
+      padding: 1rem 0 0.75rem !important;
+    }
+
+    /* Main grid: single column on mobile */
+    .main-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1.6rem !important;
+      flex: none !important;
+      overflow: visible !important;
+      height: auto !important;
+    }
+
+    /* Form column: allow natural height */
+    .form-column {
+      overflow: visible !important;
+    }
+
+    /* Textarea: fixed height on mobile instead of flex-grow */
+    textarea.form-field {
+      min-height: 110px !important;
+      flex: none !important;
+    }
+
+    /* Submit row: stack on very small screens */
+    .submit-row {
+      flex-wrap: wrap;
+      gap: 0.75rem !important;
+    }
+
+    /* Info card: auto height on mobile */
+    .info-card {
+      height: auto !important;
+    }
+
+    /* Right panel: auto height on mobile */
+    .right-panel {
+      overflow: visible !important;
+      height: auto !important;
+    }
+
+    /* Reduce glow orbs on mobile to avoid overflow */
+    .glow-orb {
+      opacity: 0.07;
+    }
+  }
+
+  /* Extra small screens */
+  @media (max-width: 380px) {
+    .logo-mark {
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+    }
+    .page-header {
+      padding: 0.9rem 1rem !important;
+    }
+    .page-main {
+      padding: 0 1rem 2rem !important;
+    }
+    .submit-btn {
+      padding: 0.75rem 1.8rem;
+      width: 100%;
+    }
+    .submit-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-dot"></div>
+
+<div class="glow-orb" style="width:450px;height:450px;background:#c9a84c;top:-130px;right:-100px;"></div>
+<div class="glow-orb" style="width:320px;height:320px;background:#7b61ff;bottom:-80px;left:-70px;"></div>
+
+<!-- ===== DOVE SCENE ===== -->
+<div id="dove-scene">
+  <div id="dove-unit">
+    <svg id="dove-svg" viewBox="0 0 180 200" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+
+      <!-- String from beak to envelope (starts at beak ~145,75 and goes to envelope top) -->
+      <line x1="148" y1="76" x2="90" y2="118" stroke="rgba(255,240,180,0.75)" stroke-width="1.2" stroke-dasharray="3,2"/>
+
+      <!-- ENVELOPE GROUP (hanging) -->
+      <g id="env-hang" transform="translate(0,118)">
+        <!-- Envelope body -->
+        <rect x="58" y="2" width="64" height="46" rx="4" fill="#f7e9c5" stroke="#c9a84c" stroke-width="1.8"/>
+        <!-- Envelope flap closed -->
+        <polygon points="58,2 90,30 122,2" fill="#ead9a0" stroke="#c9a84c" stroke-width="1.2"/>
+        <!-- Bottom fold lines -->
+        <line x1="58" y1="48" x2="90" y2="28" stroke="#c9a84c" stroke-width="0.9" opacity="0.45"/>
+        <line x1="122" y1="48" x2="90" y2="28" stroke="#c9a84c" stroke-width="0.9" opacity="0.45"/>
+        <!-- Gold wax seal -->
+        <circle cx="90" cy="32" r="7" fill="#c9a84c"/>
+        <circle cx="90" cy="32" r="5" fill="#f0c040" opacity="0.7"/>
+        <text x="90" y="36" text-anchor="middle" fill="#5a3e00" font-size="7" font-family="'Cormorant Garamond',serif" font-weight="600">E</text>
+        <!-- Small lines on envelope suggesting text -->
+        <line x1="68" y1="38" x2="112" y2="38" stroke="#c9a84c" stroke-width="0.7" opacity="0.3"/>
+        <line x1="68" y1="43" x2="100" y2="43" stroke="#c9a84c" stroke-width="0.7" opacity="0.3"/>
+      </g>
+
+      <!-- DOVE BODY -->
+      <!-- Tail fan -->
+      <ellipse cx="38" cy="76" rx="22" ry="8" fill="#f2f2f2" transform="rotate(-25,38,76)"/>
+      <ellipse cx="34" cy="80" rx="17" ry="5.5" fill="#e8e8e8" transform="rotate(-35,34,80)"/>
+      <!-- Tail feather lines -->
+      <line x1="42" y1="69" x2="20" y2="88" stroke="#ccc" stroke-width="0.6"/>
+      <line x1="38" y1="70" x2="18" y2="88" stroke="#ccc" stroke-width="0.6"/>
+
+      <!-- Main body -->
+      <ellipse cx="88" cy="74" rx="46" ry="21" fill="#fdfdfd"/>
+      <!-- Body shading -->
+      <ellipse cx="85" cy="78" rx="38" ry="14" fill="rgba(220,220,220,0.3)"/>
+
+      <!-- UPPER WINGS -->
+      <g class="wing-up">
+        <path d="M72,68 Q55,30 95,14 Q118,28 110,62 Z" fill="#f8f8f8" stroke="#ddd" stroke-width="0.6"/>
+        <path d="M76,68 Q64,38 93,22 Q110,34 106,64 Z" fill="white"/>
+        <!-- Feather detail lines -->
+        <line x1="80" y1="66" x2="86" y2="26" stroke="#d0d0d0" stroke-width="0.6"/>
+        <line x1="87" y1="66" x2="90" y2="20" stroke="#d0d0d0" stroke-width="0.6"/>
+        <line x1="94" y1="66" x2="94" y2="22" stroke="#d0d0d0" stroke-width="0.6"/>
+        <line x1="100" y1="66" x2="100" y2="28" stroke="#d0d0d0" stroke-width="0.6"/>
+      </g>
+
+      <!-- LOWER WINGS -->
+      <g class="wing-dn">
+        <path d="M72,80 Q55,118 93,132 Q116,116 110,84 Z" fill="#ececec" stroke="#ddd" stroke-width="0.6"/>
+        <path d="M76,80 Q64,112 92,126 Q108,112 106,82 Z" fill="#f2f2f2"/>
+        <line x1="80" y1="82" x2="86" y2="120" stroke="#d0d0d0" stroke-width="0.6"/>
+        <line x1="87" y1="82" x2="90" y2="124" stroke="#d0d0d0" stroke-width="0.6"/>
+        <line x1="94" y1="82" x2="94" y2="126" stroke="#d0d0d0" stroke-width="0.6"/>
+        <line x1="100" y1="82" x2="100" y2="120" stroke="#d0d0d0" stroke-width="0.6"/>
+      </g>
+
+      <!-- NECK & HEAD -->
+      <ellipse cx="116" cy="76" rx="18" ry="13" fill="white"/>
+      <circle cx="132" cy="63" r="18" fill="white"/>
+      <!-- Iridescent neck sheen -->
+      <ellipse cx="118" cy="73" rx="10" ry="7" fill="rgba(160,210,190,0.28)"/>
+      <ellipse cx="126" cy="68" rx="7" ry="5" fill="rgba(180,200,255,0.18)"/>
+
+      <!-- EYE -->
+      <circle cx="140" cy="59" r="5" fill="#1c1c1c"/>
+      <circle cx="140" cy="59" r="3.2" fill="#2e2e2e"/>
+      <circle cx="141.5" cy="57.5" r="1.3" fill="white"/>
+      <!-- Eye ring -->
+      <circle cx="140" cy="59" r="5" fill="none" stroke="#555" stroke-width="0.5"/>
+
+      <!-- BEAK -->
+      <path d="M146,64 L162,59 L146,71 Z" fill="#c9a84c"/>
+      <line x1="146" y1="67.5" x2="162" y2="63" stroke="#a07830" stroke-width="0.7"/>
+      <!-- Nostril dot -->
+      <circle cx="150" cy="64" r="1" fill="#a07830" opacity="0.5"/>
+
+      <!-- FEET (tucked in flight) -->
+      <line x1="82" y1="90" x2="74" y2="105" stroke="#f0c040" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="74" y1="105" x2="66" y2="107" stroke="#f0c040" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="74" y1="105" x2="72" y2="110" stroke="#f0c040" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="74" y1="105" x2="78" y2="110" stroke="#f0c040" stroke-width="1.2" stroke-linecap="round"/>
+
+      <line x1="96" y1="92" x2="90" y2="107" stroke="#f0c040" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="90" y1="107" x2="82" y2="109" stroke="#f0c040" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="90" y1="107" x2="88" y2="113" stroke="#f0c040" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="90" y1="107" x2="94" y2="112" stroke="#f0c040" stroke-width="1.2" stroke-linecap="round"/>
+
+    </svg>
+  </div>
+</div>
+
+<div id="success-msg">✦ Message delivered — we'll be in touch</div>
+
+<!-- Nav Overlay -->
+<div id="nav-overlay">
+  <div id="close-btn" onclick="closeNav()">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <line x1="2" y1="2" x2="16" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="16" y1="2" x2="2" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <nav style="text-align:center;">
+    <a href="{% url 'home' %}" class="nav-link" onclick="closeNav()">Home</a>
+    <a href="{% url 'about' %}" class="nav-link" onclick="closeNav()">About</a>
+    <a href="{% url 'team' %}" class="nav-link" onclick="closeNav()">Team</a>
+    <a href="{% url 'ourworks' %}" class="nav-link" onclick="closeNav()">Our Works</a>
+    <a href="{% url 'contact' %}" class="nav-link active-link" onclick="closeNav()">Contact</a>  
+  </nav>
+  <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;gap:6px;align-items:center;">
+    <div style="width:30px;height:1px;background:var(--accent);opacity:0.4;"></div>
+    <div style="width:6px;height:6px;background:var(--accent);border-radius:50%;opacity:0.7;"></div>
+    <div style="width:30px;height:1px;background:var(--accent);opacity:0.4;"></div>
+  </div>
+</div>
+
+<!-- Page -->
+<div class="page-wrap" style="position:relative;z-index:1;height:100vh;display:flex;flex-direction:column;overflow:hidden;">
+
+  <!-- HEADER -->
+  <header class="page-header fade-in" style="display:flex;align-items:center;justify-content:space-between;padding:1.3rem 3rem;border-bottom:1px solid rgba(201,168,76,0.1);flex-shrink:0;">
+    <a href="#" style="display:flex;align-items:center;text-decoration:none;">
+      <div class="logo-icon">E</div>
+      <span class="logo-mark">Elite <span>Events</span></span>
+    </a>
+    <div id="hamburger-btn" onclick="openNav()" style="display:flex;flex-direction:column;justify-content:center;padding:6px;">
+      <span class="ham-line"></span>
+      <span class="ham-line" style="width:17px;"></span>
+      <span class="ham-line"></span>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="page-main" style="flex:1;overflow:hidden;display:flex;flex-direction:column;padding:0 3rem 1.5rem;">
+
+    <div class="page-title-section fade-in fade-in-d1" style="padding:1.1rem 0 0.9rem;">
+      <div class="subtitle" style="margin-bottom:0.3rem;">✦ Get In Touch</div>
+      <h1 class="section-title">Contact <span class="accent">Me</span></h1>
+    </div>
+
+    <div class="main-grid fade-in fade-in-d2" style="display:grid;grid-template-columns:1fr 1fr;gap:2.2rem;flex:1;overflow:hidden;">
+
+      <!-- LEFT: Form -->
+      <div class="form-column" style="display:flex;flex-direction:column;overflow:hidden;">
+        <div class="enquiry-label">For Enquiry</div>
+        
+        <form method="POST" action="{% url 'contact' %}">
+        {% csrf_token %}
+        <div style="display:flex;flex-direction:column;gap:0.58rem;flex:1;">
+          <input class="form-field" type="text" id="f-name" name="name" placeholder="Name" autocomplete="off" />
+          <input class="form-field" type="email" id="f-email" name="email" placeholder="Email" autocomplete="off" />
+          <input class="form-field" type="tel" id="f-phone" name="phone" placeholder="Phone Number" autocomplete="off" />
+          <input class="form-field" type="text" id="f-subject" name="subject" placeholder="Subject" autocomplete="off" />
+          <textarea class="form-field" id="f-message" name="message" placeholder="Your message…" style="flex:1;min-height:88px;"></textarea>          
+          <div class="submit-row" style="display:flex;align-items:center;gap:1.5rem;margin-top:0.3rem;">
+            <button type="button" class="submit-btn" onclick="handleSubmit()"><span>Send Message</span></button>
+            <div style="font-size:0.67rem;color:rgba(240,237,232,0.22);letter-spacing:0.12em;font-weight:300;">We respond within 24h</div>
+          </div>
+        </div>
+        </form>
+      </div>
+
+      <!-- RIGHT: Contact Info -->
+      <div class="right-panel" style="overflow:hidden;">
+        <div class="info-card" style="padding:1.8rem 2rem 1.4rem;">
+          <div class="corner-tl"></div>
+          <div class="corner-br"></div>
+          <div style="position:relative;z-index:1;margin-bottom:1.3rem;padding-bottom:1.1rem;border-bottom:1px solid rgba(255,255,255,0.07);">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <div style="width:42px;height:42px;border:1.5px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent-bright);font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;background:rgba(201,168,76,0.1);box-shadow:0 0 16px rgba(201,168,76,0.25);flex-shrink:0;">E</div>
+              <div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;letter-spacing:0.08em;color:#fff;">Elite Events</div>
+                <div style="font-size:0.6rem;letter-spacing:0.28em;color:var(--accent);text-transform:uppercase;font-weight:300;">Events & Experiences</div>
+              </div>
+            </div>
+          </div>
+          <div style="position:relative;z-index:1;">
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div><div class="info-label">Location</div><div class="info-value">{{ contact_info.address|default:"Chennai, Tamil Nadu" }}</div></div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.7A2 2 0 012.18 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 8.15a16 16 0 006.94 6.94l1.52-1.52a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              </div>
+              <div><div class="info-label">Call Us</div><div class="info-value">{{ contact_info.phone|default:"+91 98843 67772" }}</div></div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div><div class="info-label">Email</div><div class="info-value">{{ contact_info.email|default:"info@eliteevents.com" }}</div></div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div><div class="info-label">Working Hours</div><div class="info-value">Mon – Sat, 9:00 AM – 7:00 PM</div></div>
+            </div>
+          </div>
+          <div style="position:relative;z-index:1;margin-top:1rem;padding-top:0.9rem;border-top:1px solid rgba(255,255,255,0.06);display:flex;gap:0.8rem;align-items:center;">
+            <div style="font-size:0.6rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(240,237,232,0.2);font-weight:300;">Follow</div>
+            <div style="display:flex;gap:0.55rem;margin-left:0.4rem;">
+              <a href="{{ contact_info.instagram|default:'#' }}" style="width:27px;height:27px;border:1px solid rgba(201,168,76,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(240,237,232,0.35);text-decoration:none;font-size:0.62rem;transition:all 0.3s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent-bright)';this.style.boxShadow='0 0 10px rgba(201,168,76,0.3)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.15)';this.style.color='rgba(240,237,232,0.35)';this.style.boxShadow='none'" onclick="if(!this.href||this.href.endsWith('#'))event.preventDefault();" target="_blank">ig</a>
+              <a href="{{ contact_info.facebook|default:'#' }}" style="width:27px;height:27px;border:1px solid rgba(201,168,76,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(240,237,232,0.35);text-decoration:none;font-size:0.62rem;transition:all 0.3s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent-bright)';this.style.boxShadow='0 0 10px rgba(201,168,76,0.3)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.15)';this.style.color='rgba(240,237,232,0.35)';this.style.boxShadow='none'" onclick="if(!this.href||this.href.endsWith('#'))event.preventDefault();" target="_blank">fb</a>
+              <a href="{{ contact_info.whatsapp|default:'#' }}" style="width:27px;height:27px;border:1px solid rgba(201,168,76,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(240,237,232,0.35);text-decoration:none;font-size:0.62rem;transition:all 0.3s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent-bright)';this.style.boxShadow='0 0 10px rgba(201,168,76,0.3)'" onmouseout="this.style.borderColor='rgba(201,168,76,0.15)';this.style.color='rgba(240,237,232,0.35)';this.style.boxShadow='none'" onclick="if(!this.href||this.href.endsWith('#'))event.preventDefault();" target="_blank">wa</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const dot = document.getElementById('cursor-dot');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+    dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a,button,input,textarea,[onclick]').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.style.transform = 'translate(-50%,-50%) scale(1.8)');
+    el.addEventListener('mouseleave', () => cursor.style.transform = 'translate(-50%,-50%) scale(1)');
+  });
+
+  // Nav
+  function openNav() { document.getElementById('nav-overlay').classList.add('open'); }
+  function closeNav() { document.getElementById('nav-overlay').classList.remove('open'); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
+
+  // ===== DOVE FLIGHT =====
+  let flyAnim = null;
+
+  function spawnTrail(x, y) {
+    const scene = document.getElementById('dove-scene');
+    const d = document.createElement('div');
+    d.className = 'trail-dot';
+    const sz = 8 + Math.random() * 14;
+    d.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;margin-left:-${sz/2}px;margin-top:-${sz/2}px;`;
+    scene.appendChild(d);
+    setTimeout(() => d.remove(), 900);
+  }
+
+  function spawnSparkles(x, y, count) {
+    const scene = document.getElementById('dove-scene');
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      const angle = Math.random() * 360;
+      const dist = 25 + Math.random() * 55;
+      const sx = Math.cos(angle * Math.PI / 180) * dist + 'px';
+      const sy = Math.sin(angle * Math.PI / 180) * dist + 'px';
+      const sz = 3 + Math.random() * 6;
+      s.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;--sx:${sx};--sy:${sy};animation-delay:${Math.random()*0.2}s;`;
+      scene.appendChild(s);
+      setTimeout(() => s.remove(), 1100);
+    }
+  }
+
+  function handleSubmit() {
+    const name = document.getElementById('f-name').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    if (!name || !email) {
+      ['f-name','f-email'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el.value.trim()) {
+          el.style.borderColor = '#e05c3a';
+          el.style.boxShadow = '0 0 14px rgba(224,92,58,0.35)';
+          setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 1500);
+        }
+      });
+      return;
+    }
+
+    const scene = document.getElementById('dove-scene');
+    const unit = document.getElementById('dove-unit');
+    scene.style.display = 'block';
+
+    // Reset position
+    unit.style.transform = 'translate(0,0) rotate(0deg)';
+    unit.style.opacity = '0';
+
+    const startX = -180;
+    const startY = window.innerHeight * 0.35;
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+
+    const duration = 3200; // ms
+    let startTime = null;
+
+    const p0 = { x: startX, y: H * 0.65 };
+    const p1 = { x: W * 0.25, y: H * 0.42 };
+    const p2 = { x: W * 0.6,  y: H * 0.15 };
+    const p3 = { x: W + 200,  y: -H * 0.3 };
+
+    function bezier(t, p0, p1, p2, p3) {
+      const mt = 1 - t;
+      return {
+        x: mt*mt*mt*p0.x + 3*mt*mt*t*p1.x + 3*mt*t*t*p2.x + t*t*t*p3.x,
+        y: mt*mt*mt*p0.y + 3*mt*mt*t*p1.y + 3*mt*t*t*p2.y + t*t*t*p3.y
+      };
+    }
+
+    let lastTrail = 0;
+    let lastSparkle = 0;
+
+    function fly(ts) {
+      if (!startTime) startTime = ts;
+      const elapsed = ts - startTime;
+      const t = Math.min(elapsed / duration, 1);
+
+      const pos = bezier(t, p0, p1, p2, p3);
+      const dt = 0.01;
+      const pos2 = bezier(Math.min(t + dt, 1), p0, p1, p2, p3);
+      const angle = Math.atan2(pos2.y - pos.y, pos2.x - pos.x) * 180 / Math.PI;
+
+      unit.style.opacity = t < 0.05 ? (t / 0.05).toString() : t > 0.85 ? ((1-t)/0.15).toString() : '1';
+      unit.style.transform = `translate(${pos.x - startX}px, ${pos.y - p0.y}px) rotate(${angle * 0.4}deg)`;
+
+      if (ts - lastTrail > 80) {
+        spawnTrail(pos.x + 90, pos.y + 90);
+        lastTrail = ts;
+      }
+      if (ts - lastSparkle > 350) {
+        spawnSparkles(pos.x + 90, pos.y + 60, 6);
+        lastSparkle = ts;
+      }
+
+      if (t < 1) {
+        flyAnim = requestAnimationFrame(fly);
+      } else {
+        scene.style.display = 'none';
+        unit.style.transform = '';
+        unit.style.opacity = '';
+        document.querySelector('form').submit();
+      }    
+    }
+
+    spawnSparkles(W * 0.18, H * 0.72, 14);
+    flyAnim = requestAnimationFrame(fly);
+  }
+</script>
+</body>
+</html>

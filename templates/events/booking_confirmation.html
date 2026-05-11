@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; }
+    .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 8px; overflow: hidden; }
+    .header { background: #0a0a0a; padding: 30px; text-align: center; }
+    .header h1 { color: #c9a84c; font-size: 1.8rem; margin: 0; }
+    .header p { color: #888; font-size: 0.8rem; letter-spacing: 0.2em; margin: 5px 0 0; }
+    .body { padding: 35px 40px; }
+    .body h2 { color: #222; font-size: 1.2rem; margin-bottom: 20px; }
+    .details { background: #f9f9f9; border-left: 3px solid #c9a84c; padding: 20px; border-radius: 4px; margin: 20px 0; }
+    .details p { margin: 8px 0; color: #444; font-size: 0.9rem; }
+    .details strong { color: #222; }
+    .footer { background: #0a0a0a; padding: 20px; text-align: center; }
+    .footer p { color: #555; font-size: 0.75rem; margin: 0; }
+    .footer span { color: #c9a84c; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Elite Events</h1>
+      <p>LUXURY EVENT SPECIALISTS</p>
+    </div>
+    <div class="body">
+      <h2>Dear {{ name }}, your booking is confirmed! 🎉</h2>
+      <p style="color:#555;font-size:0.9rem;">Thank you for choosing Elite Events. Here are your booking details:</p>
+      <div class="details">
+        <p><strong>Name:</strong> {{ name }}</p>
+        <p><strong>Email:</strong> {{ email }}</p>
+        <p><strong>Phone:</strong> {{ phone }}</p>
+        <p><strong>Event Type:</strong> {{ event_type }}</p>
+        <p><strong>Event Date:</strong> {{ event_date }}</p>
+      </div>
+      <p style="color:#555;font-size:0.9rem;">Our team will contact you shortly to discuss further details.</p>
+    </div>
+    <div class="footer">
+      <p>© 2025 <span>Elite Events</span> India. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

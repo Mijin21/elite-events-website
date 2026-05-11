@@ -1,0 +1,222 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Event — Elite Events</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root { --accent: #c9a84c; --accent-bright: #f0c040; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: #0d0c08;
+    font-family: 'Jost', sans-serif;
+    color: #f0ede8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* no scroll */
+  }
+
+  .card {
+    width: 460px;
+    border: 1px solid #c9a84c;
+    background: linear-gradient(160deg,#1c1606,#0d0c08);
+    padding: 28px 36px 24px;
+    border-radius: 2px;
+    position: relative;
+  }
+
+  .gold-bar {
+    height: 2px;
+    background: linear-gradient(90deg,#6b4f10,#f0c040,#c9a84c,#f0c040,#6b4f10);
+    margin-bottom: 20px;
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  .logo span { color: var(--accent-bright); }
+
+  .subtitle {
+    font-size: 0.6rem;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  .welcome {
+    text-align: center;
+    margin-bottom: 16px;
+    font-size: 0.8rem;
+    color: #888;
+  }
+  .welcome span { color: var(--accent-bright); }
+
+  .field-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 5px;
+    display: block;
+  }
+
+  .field-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #f0ede8;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.83rem;
+    font-weight: 300;
+    padding: 0.45rem 0.9rem;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.3s;
+    margin-bottom: 12px;
+  }
+  .field-input:focus { border-color: var(--accent); box-shadow: 0 0 14px rgba(201,168,76,0.15); }
+  .field-input option { background: #1c1606; color: #f0ede8; }
+
+  /* Two column grid for name+email, phone+date */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+  }
+
+  .btn {
+    width: 100%;
+    background: transparent;
+    border: 1.5px solid var(--accent);
+    color: var(--accent-bright);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    padding: 0.65rem;
+    cursor: pointer;
+    transition: all 0.4s;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg,var(--accent),var(--accent-bright));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.22,1,0.36,1); z-index: 0;
+  }
+  .btn:hover::before { transform: scaleX(1); }
+  .btn:hover { color: #111; }
+  .btn span { position: relative; z-index: 1; }
+
+  .corner-tl { position: absolute; top: 10px; left: 10px; width: 14px; height: 14px; border-top: 1.5px solid var(--accent); border-left: 1.5px solid var(--accent); }
+  .corner-br { position: absolute; bottom: 10px; right: 10px; width: 14px; height: 14px; border-bottom: 1.5px solid var(--accent); border-right: 1.5px solid var(--accent); }
+
+  .success-msg {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--accent-bright);
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 2px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .footer-links {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 0.75rem;
+    color: #555;
+  }
+  .footer-links a { color: #c9a84c; text-decoration: none; }
+  .footer-links a:last-child { color: #555; }
+
+  /* Date input color fix */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.6) sepia(1) saturate(2) hue-rotate(5deg);
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+  <div class="gold-bar"></div>
+
+  <p class="logo">Elite <span>Events</span></p>
+  <p class="subtitle">✦ Book Your Event ✦</p>
+  <p class="welcome">Welcome, <span>{{ request.user.username }}</span> ✦</p>
+
+  {% if success %}
+  <div class="success-msg">✦ Your event has been booked! We'll contact you soon.</div>
+  {% endif %}
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <!-- Row 1: Name + Email -->
+    <div class="form-grid">
+      <div>
+        <label class="field-label">Full Name</label>
+        <input class="field-input" type="text" name="name" placeholder="Your full name" required>
+      </div>
+      <div>
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" name="email" placeholder="Your email" required>
+      </div>
+    </div>
+
+    <!-- Row 2: Phone + Event Date -->
+    <div class="form-grid">
+      <div>
+        <label class="field-label">Phone</label>
+        <input class="field-input" type="tel" name="phone" placeholder="Phone number" required>
+      </div>
+      <div>
+        <label class="field-label">Event Date</label>
+        <input class="field-input" type="date" name="event_date" required>
+      </div>
+    </div>
+
+    <!-- Event Type - full width -->
+    <label class="field-label">Event Type</label>
+    <select class="field-input" name="event_type" required>
+      <option value="" disabled selected>Select event type</option>
+      <option value="wedding">Wedding</option>
+      <option value="corporate">Corporate Event</option>
+      <option value="birthday">Birthday Party</option>
+      <option value="engagement">Engagement</option>
+      <option value="concert">Concert</option>
+      <option value="other">Other</option>
+    </select>
+
+    <button type="submit" class="btn"><span>Confirm Booking</span></button>
+  </form>
+
+  <p class="footer-links">
+    <a href="{% url 'home' %}">← Back to Home</a>
+    &nbsp;|&nbsp;
+    <a href="{% url 'logout' %}">Logout</a>
+  </p>
+</div>
+</body>
+</html>

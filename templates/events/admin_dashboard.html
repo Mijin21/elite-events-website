@@ -1,0 +1,3822 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Elite Events</title>
+  {% load static %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ============================================================
+   CSS VARIABLES & RESET
+============================================================ */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --gold-dim: #8B6914;
+      --gold-faint: rgba(201, 168, 76, 0.08);
+      --gold-border: rgba(201, 168, 76, 0.15);
+      --gold-border-hover: rgba(201, 168, 76, 0.35);
+      --black: #0A0A0A;
+      --bg: #0D0D0D;
+      --surface: #141414;
+      --surface-2: #1A1A1A;
+      --surface-3: #202020;
+      --surface-4: #282828;
+      --text-1: #F0EBE0;
+      --text-2: #9A9080;
+      --text-3: #5A5248;
+      --danger: #E05252;
+      --success: #5CB87B;
+      --warning: #E8A84C;
+      --info: #5B9BD5;
+      --sidebar-w: 260px;
+      --topbar-h: 64px;
+      --font-d: 'Cormorant Garamond', serif;
+      --font-b: 'Outfit', sans-serif;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html {
+      font-size: 14px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-1);
+      font-family: var(--font-b);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+   SCROLLBAR
+============================================================ */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(201, 168, 76, 0.2);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(201, 168, 76, 0.4);
+    }
+
+    /* ============================================================
+   SIDEBAR
+============================================================ */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--gold-border);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transition: transform var(--transition);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .sidebar-brand {
+      padding: 1.5rem 1.25rem 1rem;
+      border-bottom: 1px solid var(--gold-border);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-logo svg {
+      width: 18px;
+      height: 18px;
+      fill: #0A0A0A;
+    }
+
+    .brand-name {
+      font-family: var(--font-d);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-1);
+      line-height: 1.1;
+    }
+
+    .brand-name span {
+      color: var(--gold);
+    }
+
+    .brand-tag {
+      font-size: 0.65rem;
+      color: var(--text-3);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* Nav */
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem 0.75rem;
+    }
+
+    .nav-section-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      font-weight: 600;
+      padding: 0.75rem 0.5rem 0.4rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--text-2);
+      font-size: 0.84rem;
+      font-weight: 400;
+      transition: all var(--transition);
+      position: relative;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .nav-item svg {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+      transition: color var(--transition);
+    }
+
+    .nav-item:hover {
+      background: var(--gold-faint);
+      color: var(--text-1);
+    }
+
+    .nav-item.active {
+      background: var(--gold-faint);
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 25%;
+      bottom: 25%;
+      width: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--gold);
+      color: #0A0A0A;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 20px;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    /* Sidebar Footer */
+    .sidebar-footer {
+      padding: 0.75rem;
+      border-top: 1px solid var(--gold-border);
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #0A0A0A;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role {
+      font-size: 0.68rem;
+      color: var(--text-3);
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-3);
+      padding: 4px;
+      border-radius: 6px;
+      transition: color var(--transition), background var(--transition);
+      display: flex;
+      align-items: center;
+    }
+
+    .logout-btn:hover {
+      color: var(--danger);
+      background: rgba(224, 82, 82, 0.08);
+    }
+
+    .logout-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ============================================================
+   TOPBAR
+============================================================ */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-w);
+      right: 0;
+      height: var(--topbar-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--gold-border);
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      gap: 1rem;
+      z-index: 90;
+      transition: left var(--transition);
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-2);
+      padding: 6px;
+      border-radius: 6px;
+      transition: color var(--transition);
+    }
+
+    .menu-toggle:hover {
+      color: var(--gold);
+    }
+
+    .menu-toggle svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .topbar-title {
+      font-family: var(--font-d);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+
+    .topbar-breadcrumb {
+      font-size: 0.75rem;
+      color: var(--text-3);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .topbar-btn {
+      background: none;
+      border: 1px solid var(--gold-border);
+      border-radius: var(--radius-sm);
+      color: var(--text-2);
+      cursor: pointer;
+      padding: 7px 10px;
+      font-size: 0.8rem;
+      font-family: var(--font-b);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+
+    .topbar-btn:hover {
+      border-color: var(--gold-border-hover);
+      color: var(--gold);
+      background: var(--gold-faint);
+    }
+
+    .topbar-btn svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .notif-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      position: absolute;
+      top: 6px;
+      right: 7px;
+    }
+
+    /* ============================================================
+   MAIN CONTENT
+============================================================ */
+    .main-content {
+      margin-left: var(--sidebar-w);
+      margin-top: var(--topbar-h);
+      flex: 1;
+      padding: 1.75rem;
+      min-width: 0;
+      transition: margin-left var(--transition);
+    }
+
+    /* ============================================================
+   SECTIONS (TAB PANELS)
+============================================================ */
+    .section {
+      display: none;
+      animation: sectionIn 0.3s ease both;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes sectionIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ============================================================
+   STAT CARDS
+============================================================ */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--gold-border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .stat-card:hover {
+      border-color: var(--gold-border-hover);
+      transform: translateY(-2px);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .stat-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .stat-icon.gold {
+      background: rgba(201, 168, 76, 0.12);
+      color: var(--gold);
+    }
+
+    .stat-icon.green {
+      background: rgba(92, 184, 123, 0.12);
+      color: var(--success);
+    }
+
+    .stat-icon.red {
+      background: rgba(224, 82, 82, 0.12);
+      color: var(--danger);
+    }
+
+    .stat-icon.blue {
+      background: rgba(91, 155, 213, 0.12);
+      color: var(--info);
+    }
+
+    .stat-value {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text-1);
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-2);
+      font-weight: 400;
+    }
+
+    .stat-change {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+
+    .stat-change.up {
+      background: rgba(92, 184, 123, 0.12);
+      color: var(--success);
+    }
+
+    .stat-change.down {
+      background: rgba(224, 82, 82, 0.12);
+      color: var(--danger);
+    }
+
+    /* ============================================================
+   SECTION HEADERS
+============================================================ */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .section-header h2 {
+      font-family: var(--font-d);
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+
+    .section-header p {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      margin-top: 0.2rem;
+    }
+
+    /* ============================================================
+   CARDS
+============================================================ */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--gold-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--gold-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .card-head h3 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-1);
+    }
+
+    .card-body {
+      padding: 1.25rem;
+    }
+
+    /* Chart Card */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 220px;
+    }
+
+    /* ============================================================
+   TABLES
+============================================================ */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    th {
+      background: var(--surface-2);
+      color: var(--text-3);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      padding: 0.65rem 1rem;
+      text-align: left;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--gold-border);
+    }
+
+    td {
+      padding: 0.75rem 1rem;
+      color: var(--text-1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(201, 168, 76, 0.03);
+    }
+
+    /* ============================================================
+   BADGES / PILLS
+============================================================ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge.pending {
+      background: rgba(232, 168, 76, 0.12);
+      color: var(--warning);
+    }
+
+    .badge.approved {
+      background: rgba(92, 184, 123, 0.12);
+      color: var(--success);
+    }
+
+    .badge.rejected {
+      background: rgba(224, 82, 82, 0.12);
+      color: var(--danger);
+    }
+
+    .badge.read {
+      background: rgba(91, 155, 213, 0.12);
+      color: var(--info);
+    }
+
+    .badge.unread {
+      background: rgba(201, 168, 76, 0.12);
+      color: var(--gold);
+    }
+
+    .badge.active {
+      background: rgba(92, 184, 123, 0.12);
+      color: var(--success);
+    }
+
+    .badge.inactive {
+      background: rgba(90, 82, 72, 0.2);
+      color: var(--text-2);
+    }
+
+    /* ============================================================
+   BUTTONS
+============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-b);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all var(--transition);
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      color: #0A0A0A;
+      border-color: transparent;
+    }
+
+    .btn-gold:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text-2);
+      border-color: var(--gold-border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold-border-hover);
+      color: var(--gold);
+      background: var(--gold-faint);
+    }
+
+    .btn-danger {
+      background: rgba(224, 82, 82, 0.1);
+      color: var(--danger);
+      border-color: rgba(224, 82, 82, 0.2);
+    }
+
+    .btn-danger:hover {
+      background: rgba(224, 82, 82, 0.2);
+    }
+
+    .btn-success {
+      background: rgba(92, 184, 123, 0.1);
+      color: var(--success);
+      border-color: rgba(92, 184, 123, 0.2);
+    }
+
+    .btn-success:hover {
+      background: rgba(92, 184, 123, 0.2);
+    }
+
+    .btn-sm {
+      padding: 0.3rem 0.65rem;
+      font-size: 0.74rem;
+    }
+
+    .btn-icon {
+      padding: 0.4rem;
+    }
+
+    /* ============================================================
+   FORMS (INSIDE DASHBOARD)
+============================================================ */
+    .form-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .form-grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .form-grid-3 {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .field-group label {
+      font-size: 0.72rem;
+      color: var(--text-2);
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .dash-input,
+    .dash-select,
+    .dash-textarea {
+      background: var(--surface-3);
+      border: 1px solid var(--gold-border);
+      border-radius: var(--radius-sm);
+      color: var(--text-1);
+      font-family: var(--font-b);
+      font-size: 0.84rem;
+      padding: 0.6rem 0.8rem;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      width: 100%;
+    }
+
+    .dash-input::placeholder,
+    .dash-textarea::placeholder {
+      color: var(--text-3);
+    }
+
+    .dash-input:focus,
+    .dash-select:focus,
+    .dash-textarea:focus {
+      border-color: rgba(201, 168, 76, 0.5);
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.06);
+    }
+
+    .dash-select {
+      cursor: pointer;
+    }
+
+    .dash-select option {
+      background: var(--surface-2);
+    }
+
+    .dash-textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    /* ============================================================
+   MODAL
+============================================================ */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+      animation: modalBg 0.2s ease both;
+    }
+
+    @keyframes modalBg {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--gold-border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+      position: relative;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.94) translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-lg {
+      max-width: 720px;
+    }
+
+    .modal-head {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gold-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      z-index: 1;
+    }
+
+    .modal-head h3 {
+      font-family: var(--font-d);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-3);
+      padding: 4px;
+      border-radius: 6px;
+      transition: color var(--transition), background var(--transition);
+      display: flex;
+    }
+
+    .modal-close:hover {
+      color: var(--text-1);
+      background: var(--surface-3);
+    }
+
+    .modal-close svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .modal-foot {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--gold-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* ============================================================
+   IMAGE UPLOAD ZONE
+============================================================ */
+    .upload-zone {
+      border: 2px dashed var(--gold-border);
+      border-radius: var(--radius);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+      border-color: var(--gold);
+      background: var(--gold-faint);
+    }
+
+    .upload-zone svg {
+      width: 32px;
+      height: 32px;
+      color: var(--text-3);
+      margin-bottom: 0.75rem;
+    }
+
+    .upload-zone p {
+      font-size: 0.84rem;
+      color: var(--text-2);
+    }
+
+    .upload-zone p span {
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .image-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .image-thumb {
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid var(--gold-border);
+      position: relative;
+      background: var(--surface-3);
+    }
+
+    .image-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .image-thumb-del {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 2px;
+      color: var(--danger);
+      display: none;
+      align-items: center;
+    }
+
+    .image-thumb:hover .image-thumb-del {
+      display: flex;
+    }
+
+    /* ============================================================
+   CONTENT EDITOR SECTIONS
+============================================================ */
+    .content-card {
+      background: var(--surface);
+      border: 1px solid var(--gold-border);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: border-color var(--transition);
+    }
+
+    .content-card:hover {
+      border-color: var(--gold-border-hover);
+    }
+
+    .content-card-head {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      background: var(--surface-2);
+    }
+
+    .content-card-head h4 {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-1);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .content-card-head svg {
+      width: 15px;
+      height: 15px;
+      color: var(--gold);
+    }
+
+    .chevron {
+      width: 14px;
+      height: 14px;
+      color: var(--text-3);
+      transition: transform var(--transition);
+    }
+
+    .content-card-body {
+      display: none;
+      padding: 1.25rem;
+      border-top: 1px solid var(--gold-border);
+    }
+
+    .content-card.open .content-card-body {
+      display: block;
+    }
+
+    .content-card.open .chevron {
+      transform: rotate(180deg);
+    }
+
+    /* ============================================================
+   ACTIVITY FEED
+============================================================ */
+    .activity-item {
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    .activity-dot.gold {
+      background: var(--gold);
+    }
+
+    .activity-dot.green {
+      background: var(--success);
+    }
+
+    .activity-dot.red {
+      background: var(--danger);
+    }
+
+    .activity-dot.blue {
+      background: var(--info);
+    }
+
+    .activity-text {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+
+    .activity-time {
+      font-size: 0.7rem;
+      color: var(--text-3);
+    }
+
+    /* ============================================================
+   SEARCH & FILTER BAR
+============================================================ */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: var(--text-3);
+      pointer-events: none;
+    }
+
+    .search-input {
+      background: var(--surface-3);
+      border: 1px solid var(--gold-border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.75rem 0.5rem 2.2rem;
+      color: var(--text-1);
+      font-family: var(--font-b);
+      font-size: 0.82rem;
+      outline: none;
+      transition: border-color var(--transition);
+      width: 100%;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-3);
+    }
+
+    .search-input:focus {
+      border-color: rgba(201, 168, 76, 0.5);
+    }
+
+    /* ============================================================
+   SIDEBAR OVERLAY (mobile)
+============================================================ */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 99;
+    }
+
+    /* ============================================================
+   TOAST NOTIFICATIONS
+============================================================ */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      pointer-events: none;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--surface-2);
+      border: 1px solid var(--gold-border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--text-1);
+      pointer-events: all;
+      animation: toastIn 0.3s ease both;
+      max-width: 320px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .toast.success {
+      border-color: rgba(92, 184, 123, 0.3);
+    }
+
+    .toast.error {
+      border-color: rgba(224, 82, 82, 0.3);
+    }
+
+    .toast svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes toastOut {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+    }
+
+    /* ============================================================
+   CONFIRM DIALOG
+============================================================ */
+    .confirm-dialog .modal {
+      max-width: 400px;
+    }
+
+    /* ============================================================
+   MISC UTILITIES
+============================================================ */
+    .flex-between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .flex-center {
+      display: flex;
+      align-items: center;
+    }
+
+    .gap-2 {
+      gap: 0.5rem;
+    }
+
+    .gap-3 {
+      gap: 0.75rem;
+    }
+
+    .mt-1 {
+      margin-top: 0.5rem;
+    }
+
+    .mt-2 {
+      margin-top: 1rem;
+    }
+
+    .mt-3 {
+      margin-top: 1.5rem;
+    }
+
+    .mb-1 {
+      margin-bottom: 0.5rem;
+    }
+
+    .mb-2 {
+      margin-bottom: 1rem;
+    }
+
+    .text-muted {
+      color: var(--text-2);
+      font-size: 0.8rem;
+    }
+
+    .text-gold {
+      color: var(--gold);
+    }
+
+    .text-danger {
+      color: var(--danger);
+    }
+
+    .text-success {
+      color: var(--success);
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--gold-border);
+      margin: 1rem 0;
+    }
+
+    .full-w {
+      width: 100%;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: var(--text-3);
+    }
+
+    .empty-state svg {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 0.75rem;
+      opacity: 0.4;
+    }
+
+    .empty-state p {
+      font-size: 0.85rem;
+    }
+
+    /* ============================================================
+   RESPONSIVE
+============================================================ */
+    @media (max-width: 1024px) {
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid-3 {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay.open {
+        display: block;
+      }
+
+      .topbar {
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 1rem;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      .stat-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      }
+
+      .form-grid-2,
+      .form-grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-btn span {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stat-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .chart-wrap {
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============================================================
+     SIDEBAR
+============================================================ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Elite<span> Events</span></div>
+        <div class="brand-tag">Admin Panel</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+
+      <div class="nav-item active" data-section="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+        </svg>
+        Dashboard
+      </div>
+
+      <div class="nav-section-label">Management</div>
+
+      <div class="nav-item" data-section="bookings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        Bookings
+        <span class="nav-badge" id="badgeBookings">0</span>
+      </div>
+
+      <div class="nav-item" data-section="users">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        Users
+      </div>
+
+      <div class="nav-item" data-section="enquiries">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+        Enquiries
+        <span class="nav-badge" id="badgeEnquiries">0</span>
+      </div>
+
+      <div class="nav-section-label">Website Content</div>
+
+      <div class="nav-item" data-section="content">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 20h9" />
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+        </svg>
+        Content Manager
+      </div>
+
+      <div class="nav-item" data-section="images">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <polyline points="21 15 16 10 5 21" />
+        </svg>
+        Image Manager
+      </div>
+
+      <div class="nav-item" data-section="services">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon
+            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+        Services & Packages
+      </div>
+
+      <div class="nav-item" data-section="portfolio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+        </svg>
+        Portfolio
+      </div>
+
+      <div class="nav-item" data-section="testimonials">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+        Testimonials
+      </div>
+
+      <div class="nav-item" data-section="team">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        Team Members
+      </div>
+      <div class="nav-item" data-section="clients">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        Clients & Partners
+      </div>
+      <div class="nav-section-label">Settings</div>
+
+      <div class="nav-item" data-section="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+        Site Settings
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="userAvatar">AD</div>
+        <div class="user-info">
+          <div class="user-name" id="userName">{{ request.user.username }}</div>
+          <div class="user-role">Administrator</div>
+        </div>
+        <form method="POST" action="{% url 'admin_panel:logout' %}" style="display:inline">
+          {% csrf_token %}
+          <button type="submit" class="logout-btn" title="Logout">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ============================================================
+     TOPBAR
+============================================================ -->
+  <header class="topbar" id="topbar">
+    <button class="menu-toggle" id="menuToggle">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+    <div>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-breadcrumb">Admin <span>›</span> <span id="topbarBreadcrumb">Overview</span></div>
+    </div>
+
+    <div class="topbar-right">
+      <a href="{% url 'home' %}" target="_blank" class="btn btn-outline btn-sm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+          <polyline points="15 3 21 3 21 9" />
+          <line x1="10" y1="14" x2="21" y2="3" />
+        </svg>
+        <span>View Site</span>
+      </a>
+      <button class="topbar-btn" id="refreshBtn" title="Refresh data">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10" />
+          <polyline points="1 20 1 14 7 14" />
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+        </svg>
+        <span>Refresh</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+     MAIN CONTENT
+============================================================ -->
+  <main class="main-content">
+
+    <!-- ====== DASHBOARD SECTION ====== -->
+    <section class="section active" id="sec-dashboard">
+      <div class="section-header">
+        <div>
+          <h2>Dashboard Overview</h2>
+          <p>Welcome back, {{ request.user.get_full_name|default:request.user.username }}. Here's what's happening
+            today.</p>
+        </div>
+        <div class="flex-center gap-2">
+          <span class="text-muted" id="lastRefreshed">–</span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stat-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-icon gold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </div>
+          <div class="stat-value" id="statTotalBookings">–</div>
+          <div class="stat-label">Total Bookings</div>
+          <div class="stat-change up" id="statBookingChange">–</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+            </svg>
+          </div>
+          <div class="stat-value" id="statTotalUsers">–</div>
+          <div class="stat-label">Registered Users</div>
+          <div class="stat-change up" id="statUserChange">–</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+          </div>
+          <div class="stat-value" id="statTotalEnquiries">–</div>
+          <div class="stat-label">Enquiries</div>
+          <div class="stat-change up" id="statEnquiryChange">–</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon gold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+          </div>
+          <div class="stat-value" id="statMonthlyBookings">–</div>
+          <div class="stat-label">This Month</div>
+          <div class="stat-change up">Current</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="chart-grid">
+        <div class="card">
+          <div class="card-head">
+            <h3>Bookings — Last 6 Months</h3>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap"><canvas id="bookingChart"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Booking Status Breakdown</h3>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tables Row -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;" id="dashTableGrid">
+        <!-- Recent Bookings -->
+        <div class="card">
+          <div class="card-head">
+            <h3>Recent Bookings</h3>
+            <button class="btn btn-outline btn-sm" onclick="goSection('bookings')">View All</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Event</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="recentBookingsBody">
+                <tr>
+                  <td colspan="3">
+                    <div class="empty-state">
+                      <p>Loading…</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="card-head">
+            <h3>Recent Activity</h3>
+          </div>
+          <div class="card-body" id="activityFeed">
+            <div class="empty-state">
+              <p>Loading…</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== BOOKINGS SECTION ====== -->
+    <section class="section" id="sec-bookings">
+      <div class="section-header">
+        <div>
+          <h2>Booking Management</h2>
+          <p>View, approve, reject and manage all bookings.</p>
+        </div>
+        <button class="btn btn-gold" onclick="exportTable('bookingsTable','bookings')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Export CSV
+        </button>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="filter-bar">
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input type="text" class="search-input" placeholder="Search bookings…"
+                oninput="filterTable('bookingsTable',this.value)">
+            </div>
+            <select class="dash-select" style="width:130px" onchange="filterBookingStatus(this.value)"
+              id="bookingStatusFilter">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="bookingsTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Event Type</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsBody">
+              <tr>
+                <td colspan="7">
+                  <div class="empty-state">
+                    <p>Loading bookings…</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== USERS SECTION ====== -->
+    <section class="section" id="sec-users">
+      <div class="section-header">
+        <div>
+          <h2>User Management</h2>
+          <p>View and manage registered users.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="filter-bar">
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input type="text" class="search-input" placeholder="Search users…"
+                oninput="filterTable('usersTable',this.value)">
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="usersTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Joined</th>
+                <th>Last Login</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody">
+              <tr>
+                <td colspan="7">
+                  <div class="empty-state">
+                    <p>Loading users…</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== ENQUIRIES SECTION ====== -->
+    <section class="section" id="sec-enquiries">
+      <div class="section-header">
+        <div>
+          <h2>Enquiries & Messages</h2>
+          <p>Manage contact form submissions.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="filter-bar">
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input type="text" class="search-input" placeholder="Search enquiries…"
+                oninput="filterTable('enquiriesTable',this.value)">
+            </div>
+            <select class="dash-select" style="width:130px" onchange="filterEnquiryStatus(this.value)">
+              <option value="">All</option>
+              <option value="unread">Unread</option>
+              <option value="read">Read</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="enquiriesTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="enquiriesBody">
+              <tr>
+                <td colspan="7">
+                  <div class="empty-state">
+                    <p>Loading enquiries…</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== CONTENT SECTION ====== -->
+    <section class="section" id="sec-content">
+      <div class="section-header">
+        <div>
+          <h2>Content Manager</h2>
+          <p>Manage all website content dynamically.</p>
+        </div>
+      </div>
+
+      <!-- Hero Slider -->
+      <div class="content-card open" id="cc-hero">
+        <div class="content-card-head" onclick="toggleCard('cc-hero')">
+          <h4>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" />
+              <line x1="8" y1="21" x2="16" y2="21" />
+              <line x1="12" y1="17" x2="12" y2="21" />
+            </svg>
+            Hero Banner / Slider
+          </h4>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+        <div class="content-card-body">
+          <div id="heroSlides"></div>
+          <button class="btn btn-outline btn-sm mt-2" onclick="addHeroSlide()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Add Slide
+          </button>
+          <div style="margin-top:1rem; display:flex; justify-content:flex-end;">
+            <hr class="divider mt-2">
+            <div class="form-grid form-grid-2 mt-2" style="gap:0.75rem">
+              <div class="field-group"><label>Badge Text</label><input type="text" class="dash-input" id="heroBadge"
+                  placeholder="Luxury Event Specialists"></div>
+              <div class="field-group"><label>Subtitle</label><input type="text" class="dash-input" id="heroSubtitle"
+                  placeholder="From intimate gatherings..."></div>
+              <div class="field-group"><label>Title Line 1</label><input type="text" class="dash-input"
+                  id="heroTitleLine1" placeholder="We Craft"></div>
+              <div class="field-group"><label>Title Line 2 (italic)</label><input type="text" class="dash-input"
+                  id="heroTitleLine2" placeholder="Unforgettable"></div>
+              <div class="field-group"><label>Title Line 3</label><input type="text" class="dash-input"
+                  id="heroTitleLine3" placeholder="Moments"></div>
+            </div>
+            <div class="form-grid form-grid-3 mt-2" style="gap:0.75rem">
+              <div class="field-group"><label>Stat 1 Number</label><input type="text" class="dash-input"
+                  id="heroStat1Num" placeholder="500+"></div>
+              <div class="field-group"><label>Stat 1 Label</label><input type="text" class="dash-input"
+                  id="heroStat1Label" placeholder="Events Hosted"></div>
+              <div class="field-group"><label>Stat 2 Number</label><input type="text" class="dash-input"
+                  id="heroStat2Num" placeholder="98%"></div>
+              <div class="field-group"><label>Stat 2 Label</label><input type="text" class="dash-input"
+                  id="heroStat2Label" placeholder="Happy Clients"></div>
+              <div class="field-group"><label>Stat 3 Number</label><input type="text" class="dash-input"
+                  id="heroStat3Num" placeholder="20+"></div>
+              <div class="field-group"><label>Stat 3 Label</label><input type="text" class="dash-input"
+                  id="heroStat3Label" placeholder="Years Experience"></div>
+            </div>
+            <button class="btn btn-gold" onclick="saveContent('hero')">Save Hero Content</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- About -->
+      <div class="content-card" id="cc-about">
+        <div class="content-card-head" onclick="toggleCard('cc-about')">
+          <h4>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            About Section
+          </h4>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+        <div class="content-card-body">
+          <div class="form-grid form-grid-2">
+            <div class="field-group">
+              <label>Heading</label>
+              <input type="text" class="dash-input" id="aboutHeading" placeholder="About heading…">
+            </div>
+            <div class="field-group">
+              <label>Subheading</label>
+              <input type="text" class="dash-input" id="aboutSub" placeholder="Subheading…">
+            </div>
+            <div class="field-group">
+              <label>Welcome Text</label>
+              <input type="text" class="dash-input" id="aboutWelcome" placeholder="Welcome to Renaissance events,">
+            </div>
+          </div>
+          <div class="field-group mt-1">
+            <label>Body Text</label>
+            <textarea class="dash-textarea" id="aboutBody" rows="4" placeholder="About us description…"></textarea>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+            <button class="btn btn-outline" onclick="clearContent('about')">Clear All</button>
+            <button class="btn btn-gold" onclick="saveContent('about')">Save About</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Details -->
+      <div class="content-card" id="cc-contact">
+        <div class="content-card-head" onclick="toggleCard('cc-contact')">
+          <h4>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+            </svg>
+            Contact Details
+          </h4>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+        <div class="content-card-body">
+          <div class="form-grid form-grid-2">
+            <div class="field-group"><label>Phone</label><input type="text" class="dash-input" id="contactPhone"
+                placeholder="+91 …"></div>
+            <div class="field-group"><label>Email</label><input type="email" class="dash-input" id="contactEmail"
+                placeholder="contact@…"></div>
+            <div class="field-group"><label>Address</label><input type="text" class="dash-input" id="contactAddress"
+                placeholder="Address…"></div>
+            <div class="field-group"><label>WhatsApp</label><input type="text" class="dash-input" id="contactWhatsapp"
+                placeholder="+91 …"></div>
+            <div class="field-group"><label>Instagram</label><input type="text" class="dash-input" id="contactInstagram"
+                placeholder="@handle"></div>
+            <div class="field-group"><label>Facebook</label><input type="text" class="dash-input" id="contactFacebook"
+                placeholder="facebook.com/…"></div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+            <button class="btn btn-outline" onclick="clearContent('contact')">Clear All</button>
+            <button class="btn btn-gold" onclick="saveContent('contact')">Save Contact Info</button>
+          </div>
+        </div>
+      </div>
+      <!-- CorporART -->
+      <div class="content-card" id="cc-corporart">
+        <div class="content-card-head" onclick="toggleCard('cc-corporart')">
+          <h4>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+            CorporART Section
+          </h4>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+        <div class="content-card-body">
+          <div class="form-grid" style="gap:0.75rem">
+            <div class="field-group">
+              <label>Title</label>
+              <input type="text" class="dash-input" id="corporartTitle" placeholder="CorporART 24'">
+            </div>
+            <div class="field-group">
+              <label>Description</label>
+              <textarea class="dash-textarea" id="corporartDesc" rows="5"></textarea>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+            <button class="btn btn-gold" onclick="saveContent('corporart')">Save CorporART</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== IMAGES SECTION ====== -->
+    <section class="section" id="sec-images">
+      <div class="section-header">
+        <div>
+          <h2>Image Manager</h2>
+          <p>Upload, preview and manage all website images.</p>
+        </div>
+      </div>
+      <div class="card mb-2">
+        <div class="card-head">
+          <h3>Upload Images</h3>
+        </div>
+        <div class="card-body">
+          <div class="field-group mb-1">
+            <label>Category</label>
+            <select class="dash-select" id="imgCategory" style="max-width:200px">
+              <option value="hero">Hero / Banner</option>
+              <option value="portfolio">Portfolio / Works</option>
+              <option value="team">Team</option>
+              <option value="about">About</option>
+              <option value="gallery">Gallery</option>
+            </select>
+          </div>
+          <div class="upload-zone" id="uploadZone">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 16 12 12 8 16" />
+              <line x1="12" y1="12" x2="12" y2="21" />
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+            </svg>
+            <p>Drag & drop images here or <span>click to browse</span></p>
+            <p style="font-size:0.74rem; color:var(--text-3); margin-top:0.4rem;">PNG, JPG, WebP up to 5MB</p>
+          </div>
+          <input type="file" id="fileInput" multiple accept="image/*" style="display:none">
+          <div class="image-preview-grid" id="imagePreviewGrid"></div>
+          <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+            <button class="btn btn-gold" onclick="uploadImages()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 16 12 12 8 16" />
+                <line x1="12" y1="12" x2="12" y2="21" />
+                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+              </svg>
+              Upload Images
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3>Existing Images</h3>
+          <select class="dash-select" style="width:140px" onchange="loadImages(this.value)" id="imgViewCategory">
+            <option value="all">All Categories</option>
+            <option value="hero">Hero</option>
+            <option value="portfolio">Portfolio</option>
+            <option value="team">Team</option>
+            <option value="gallery">Gallery</option>
+          </select>
+        </div>
+        <div class="card-body">
+          <div class="image-preview-grid" id="existingImagesGrid">
+            <div class="empty-state" style="grid-column:1/-1">
+              <p>Loading images…</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== SERVICES SECTION ====== -->
+    <section class="section" id="sec-services">
+      <div class="section-header">
+        <div>
+          <h2>Services & Packages</h2>
+          <p>Manage your service offerings.</p>
+        </div>
+        <button class="btn btn-gold" onclick="openModal('serviceModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Add Service
+        </button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table id="servicesTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Service Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Active</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="servicesBody">
+              <tr>
+                <td colspan="6">
+                  <div class="empty-state">
+                    <p>Loading services…</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== PORTFOLIO SECTION ====== -->
+    <section class="section" id="sec-portfolio">
+      <div class="section-header">
+        <div>
+          <h2>Portfolio / Our Works</h2>
+          <p>Manage portfolio items displayed on the website.</p>
+        </div>
+        <button class="btn btn-gold" onclick="openModal('portfolioModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Add Work
+        </button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table id="portfolioTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Featured</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="portfolioBody">
+              <tr>
+                <td colspan="6">
+                  <div class="empty-state">
+                    <p>Loading portfolio…</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== TESTIMONIALS SECTION ====== -->
+    <section class="section" id="sec-testimonials">
+      <div class="section-header">
+        <div>
+          <h2>Testimonials</h2>
+          <p>Manage client testimonials.</p>
+        </div>
+        <button class="btn btn-gold" onclick="openModal('testimonialModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Add Testimonial
+        </button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table id="testimonialsTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Client</th>
+                <th>Quote</th>
+                <th>Rating</th>
+                <th>Active</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="testimonialsBody">
+              <tr>
+                <td colspan="6">
+                  <div class="empty-state">
+                    <p>Loading testimonials…</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== TEAM SECTION ====== -->
+    <section class="section" id="sec-team">
+      <div class="section-header">
+        <div>
+          <h2>Team Members</h2>
+          <p>Manage your team displayed on the website.</p>
+        </div>
+        <button class="btn btn-gold" onclick="openModal('teamModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Add Member
+        </button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table id="teamTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Email</th>
+                <th>Active</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="teamBody">
+              <tr>
+                <td colspan="6">
+                  <div class="empty-state">
+                    <p>Loading team…</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <!-- ====== CLIENTS SECTION ====== -->
+    <section class="section" id="sec-clients">
+      <div class="section-header">
+        <div>
+          <h2>Clients & Partners</h2>
+          <p>Manage clients and partners displayed on the about page.</p>
+        </div>
+        <button class="btn btn-gold" onclick="openModal('clientModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Add Client
+        </button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table id="clientsTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Active</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="clientsBody">
+              <tr>
+                <td colspan="5">
+                  <div class="empty-state">
+                    <p>Loading clients…</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <!-- ====== SETTINGS SECTION ====== -->
+    <section class="section" id="sec-settings">
+      <div class="section-header">
+        <div>
+          <h2>Site Settings</h2>
+          <p>Manage global website configuration.</p>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;" class="settings-grid">
+        <div class="card">
+          <div class="card-head">
+            <h3>General</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-grid" style="gap:0.75rem">
+              <div class="field-group"><label>Site Name</label><input type="text" class="dash-input" id="siteName"
+                  placeholder="EventLuxe"></div>
+              <div class="field-group"><label>Tagline</label><input type="text" class="dash-input" id="siteTagline"
+                  placeholder="Tagline…"></div>
+              <div class="field-group"><label>Contact Email</label><input type="email" class="dash-input" id="siteEmail"
+                  placeholder="info@…"></div>
+              <div class="field-group"><label>Contact Phone</label><input type="text" class="dash-input" id="sitePhone"
+                  placeholder="+91 …"></div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+              <button class="btn btn-gold" onclick="saveSettings('general')">Save General</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Maintenance & Access</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-grid" style="gap:0.75rem">
+              <div class="field-group" style="flex-direction:row; align-items:center; gap:0.75rem">
+                <label style="text-transform:none; letter-spacing:0">Maintenance Mode</label>
+                <label style="margin-left:auto; cursor:pointer; display:flex; align-items:center; gap:0.5rem">
+                  <input type="checkbox" id="maintenanceMode" style="accent-color:var(--gold); width:16px; height:16px">
+                  <span style="font-size:0.8rem; color:var(--text-2)">Enable</span>
+                </label>
+              </div>
+              <div class="field-group" style="flex-direction:row; align-items:center; gap:0.75rem">
+                <label style="text-transform:none; letter-spacing:0">Booking Enabled</label>
+                <label style="margin-left:auto; cursor:pointer; display:flex; align-items:center; gap:0.5rem">
+                  <input type="checkbox" id="bookingEnabled" checked
+                    style="accent-color:var(--gold); width:16px; height:16px">
+                  <span style="font-size:0.8rem; color:var(--text-2)">Enable</span>
+                </label>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+              <button class="btn btn-gold" onclick="saveSettings('access')">Save Settings</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- end .main-content -->
+
+  <!-- ============================================================
+     MODALS
+============================================================ -->
+
+  <!-- Booking Detail Modal -->
+  <div class="modal-overlay" id="bookingModal">
+    <div class="modal modal-lg">
+      <div class="modal-head">
+        <h3>Booking Details</h3>
+        <button class="modal-close" onclick="closeModal('bookingModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="bookingModalBody">Loading…</div>
+      <div class="modal-foot">
+        <button class="btn btn-danger" id="modalRejectBtn">Reject</button>
+        <button class="btn btn-success" id="modalApproveBtn">Approve</button>
+        <button class="btn btn-outline" onclick="closeModal('bookingModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enquiry Detail Modal -->
+  <div class="modal-overlay" id="enquiryModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Enquiry Details</h3>
+        <button class="modal-close" onclick="closeModal('enquiryModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body" id="enquiryModalBody">Loading…</div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" id="markReadBtn">Mark as Read</button>
+        <button class="btn btn-danger" id="deleteEnquiryBtn">Delete</button>
+        <button class="btn btn-outline" onclick="closeModal('enquiryModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service Modal -->
+  <div class="modal-overlay" id="serviceModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="serviceModalTitle">Add Service</h3>
+        <button class="modal-close" onclick="closeModal('serviceModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="serviceId">
+        <div class="form-grid" style="gap:0.75rem">
+          <div class="field-group"><label>Service Name *</label><input type="text" class="dash-input" id="serviceName"
+              placeholder="e.g. Wedding Photography"></div>
+          <div class="field-group"><label>Price (₹)</label><input type="number" class="dash-input" id="servicePrice"
+              placeholder="e.g. 25000"></div>
+          <div class="field-group"><label>Short Description</label><textarea class="dash-textarea" id="serviceDesc"
+              rows="3"></textarea></div>
+          <div class="field-group" style="flex-direction:row; align-items:center; gap:0.75rem">
+            <label style="text-transform:none">Active</label>
+            <input type="checkbox" id="serviceActive" checked
+              style="accent-color:var(--gold); width:16px; height:16px; margin-left:auto">
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" onclick="closeModal('serviceModal')">Cancel</button>
+        <button class="btn btn-gold" onclick="saveService()">Save Service</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio Modal -->
+  <div class="modal-overlay" id="portfolioModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="portfolioModalTitle">Add Portfolio Work</h3>
+        <button class="modal-close" onclick="closeModal('portfolioModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="portfolioId">
+        <div class="form-grid" style="gap:0.75rem">
+          <div class="field-group"><label>Title *</label><input type="text" class="dash-input" id="portfolioTitle"
+              placeholder="Event title"></div>
+          <div class="field-group"><label>Category</label><input type="text" class="dash-input" id="portfolioCategory"
+              placeholder="Wedding / Corporate …"></div>
+          <div class="field-group"><label>Date</label><input type="date" class="dash-input" id="portfolioDate"></div>
+          <div class="field-group"><label>Description</label><textarea class="dash-textarea" id="portfolioDesc"
+              rows="3"></textarea></div>
+          <div class="field-group">
+            <label>YouTube Video ID</label>
+            <input type="text" class="dash-input" id="portfolioVideoId" placeholder="e.g. E6bxvWJJUOc">
+          </div>
+          <div class="field-group">
+            <label>Image</label>
+            <input type="file" id="portfolioImage" accept="image/*" class="dash-input" style="padding:0.4rem;">
+          </div>
+          <div class="field-group" style="flex-direction:row; align-items:center; gap:0.75rem">
+            <label style="text-transform:none">Featured</label>
+            <input type="checkbox" id="portfolioFeatured"
+              style="accent-color:var(--gold); width:16px; height:16px; margin-left:auto">
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" onclick="closeModal('portfolioModal')">Cancel</button>
+        <button class="btn btn-gold" onclick="savePortfolio()">Save Work</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonial Modal -->
+  <div class="modal-overlay" id="testimonialModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="testimonialModalTitle">Add Testimonial</h3>
+        <button class="modal-close" onclick="closeModal('testimonialModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="testimonialId">
+        <div class="form-grid" style="gap:0.75rem">
+          <div class="field-group"><label>Client Name *</label><input type="text" class="dash-input"
+              id="testimonialName" placeholder="Client name"></div>
+          <div class="field-group"><label>Event Type</label><input type="text" class="dash-input" id="testimonialEvent"
+              placeholder="Wedding / Birthday …"></div>
+          <div class="field-group"><label>Quote *</label><textarea class="dash-textarea" id="testimonialQuote" rows="3"
+              placeholder="Client testimonial…"></textarea></div>
+          <div class="field-group">
+            <label>Rating (1–5)</label>
+            <select class="dash-select" id="testimonialRating">
+              <option value="5">★★★★★ 5</option>
+              <option value="4">★★★★☆ 4</option>
+              <option value="3">★★★☆☆ 3</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" onclick="closeModal('testimonialModal')">Cancel</button>
+        <button class="btn btn-gold" onclick="saveTestimonial()">Save Testimonial</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Modal -->
+  <div class="modal-overlay" id="teamModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="teamModalTitle">Add Team Member</h3>
+        <button class="modal-close" onclick="closeModal('teamModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="teamId">
+        <div class="form-grid form-grid-2" style="gap:0.75rem">
+          <div class="field-group"><label>Full Name *</label><input type="text" class="dash-input" id="teamName"
+              placeholder="Full name"></div>
+          <div class="field-group"><label>Role / Designation</label><input type="text" class="dash-input" id="teamRole"
+              placeholder="Photographer…"></div>
+          <div class="field-group"><label>Email</label><input type="email" class="dash-input" id="teamEmail"
+              placeholder="email@…"></div>
+          <div class="field-group"><label>Phone</label><input type="text" class="dash-input" id="teamPhone"
+              placeholder="+91 …"></div>
+        </div>
+        <div class="field-group mt-1"><label>Bio</label><textarea class="dash-textarea" id="teamBio"
+            rows="3"></textarea></div>
+        <div class="field-group mt-1">
+          <label>Photo</label>
+          <input type="file" id="teamPhoto" accept="image/*" class="dash-input" style="padding:0.4rem;">
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" onclick="closeModal('teamModal')">Cancel</button>
+        <button class="btn btn-gold" onclick="saveTeamMember()">Save Member</button>
+      </div>
+    </div>
+  </div>
+  <!-- Client Modal -->
+  <div class="modal-overlay" id="clientModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="clientModalTitle">Add Client</h3>
+        <button class="modal-close" onclick="closeModal('clientModal')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="clientId">
+        <div class="form-grid form-grid-2" style="gap:0.75rem">
+          <div class="field-group"><label>Client Name *</label><input type="text" class="dash-input" id="clientName"
+              placeholder="Client name"></div>
+          <div class="field-group"><label>Order</label><input type="number" class="dash-input" id="clientOrder"
+              placeholder="0" value="0"></div>
+        </div>
+        <div class="form-grid form-grid-2 mt-1" style="gap:0.75rem">
+          <div class="field-group" style="flex-direction:row; align-items:center; gap:0.75rem">
+            <label style="text-transform:none">Is Partner</label>
+            <input type="checkbox" id="clientIsPartner"
+              style="accent-color:var(--gold); width:16px; height:16px; margin-left:auto">
+          </div>
+          <div class="field-group" style="flex-direction:row; align-items:center; gap:0.75rem">
+            <label style="text-transform:none">Is Active</label>
+            <input type="checkbox" id="clientIsActive" checked
+              style="accent-color:var(--gold); width:16px; height:16px; margin-left:auto">
+          </div>
+        </div>
+        <div class="field-group mt-1">
+          <label>Logo</label>
+          <input type="file" id="clientLogo" accept="image/*" class="dash-input" style="padding:0.4rem;">
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" onclick="closeModal('clientModal')">Cancel</button>
+        <button class="btn btn-gold" onclick="saveClient()">Save Client</button>
+      </div>
+    </div>
+  </div>
+  <!-- Confirm Dialog -->
+  <div class="modal-overlay confirm-dialog" id="confirmDialog">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="confirmTitle">Confirm Action</h3>
+        <button class="modal-close" onclick="closeModal('confirmDialog')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessage" style="font-size:0.9rem; color:var(--text-2); line-height:1.6;">Are you sure you want to
+          proceed?</p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-outline" onclick="closeModal('confirmDialog')">Cancel</button>
+        <button class="btn btn-danger" id="confirmActionBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+  <script>
+    // ============================================================
+    // CSRF TOKEN HELPER
+    // ============================================================
+    function getCsrf() {
+      return document.cookie.split(';')
+        .find(c => c.trim().startsWith('csrftoken='))
+        ?.split('=')[1] || '{{ csrf_token }}';
+    }
+
+    const CSRF = getCsrf();
+
+    async function apiCall(url, method = 'GET', data = null) {
+      const opts = {
+        method,
+        headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+      };
+      if (data) opts.body = JSON.stringify(data);
+      const res = await fetch(url, opts);
+      return res.json();
+    }
+
+    // ============================================================
+    // NAVIGATION
+    // ============================================================
+    const sectionMeta = {
+      dashboard: { title: 'Dashboard', breadcrumb: 'Overview' },
+      bookings: { title: 'Bookings', breadcrumb: 'Management › Bookings' },
+      users: { title: 'Users', breadcrumb: 'Management › Users' },
+      enquiries: { title: 'Enquiries', breadcrumb: 'Management › Enquiries' },
+      content: { title: 'Content Manager', breadcrumb: 'Website › Content' },
+      images: { title: 'Image Manager', breadcrumb: 'Website › Images' },
+      services: { title: 'Services', breadcrumb: 'Website › Services' },
+      portfolio: { title: 'Portfolio', breadcrumb: 'Website › Portfolio' },
+      testimonials: { title: 'Testimonials', breadcrumb: 'Website › Testimonials' },
+      team: { title: 'Team Members', breadcrumb: 'Website › Team' },
+      clients: { title: 'Clients & Partners', breadcrumb: 'Website › Clients' },
+    };
+
+    let activeSection = 'dashboard';
+
+    function goSection(name) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById('sec-' + name)?.classList.add('active');
+
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelector(`.nav-item[data-section="${name}"]`)?.classList.add('active');
+
+      const meta = sectionMeta[name] || { title: name, breadcrumb: name };
+      document.getElementById('topbarTitle').textContent = meta.title;
+      document.getElementById('topbarBreadcrumb').textContent = meta.breadcrumb;
+
+      activeSection = name;
+      closeSidebar();
+      loadSection(name);
+    }
+
+    function loadSection(name) {
+      const loaders = {
+        dashboard: loadDashboard,
+        bookings: loadBookings,
+        users: loadUsers,
+        enquiries: loadEnquiries,
+        content: loadContent,
+        images: () => loadImages('all'),
+        services: loadServices,
+        portfolio: loadPortfolio,
+        testimonials: loadTestimonials,
+        team: loadTeam,
+        clients: loadClients,
+        settings: loadSettings,
+      };
+      loaders[name]?.();
+    }
+
+    document.querySelectorAll('.nav-item[data-section]').forEach(item => {
+      item.addEventListener('click', () => goSection(item.dataset.section));
+    });
+
+    // ============================================================
+    // SIDEBAR TOGGLE (MOBILE)
+    // ============================================================
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const menuBtn = document.getElementById('menuToggle');
+
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+    overlay.addEventListener('click', closeSidebar);
+
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    }
+
+    // ============================================================
+    // MODAL HELPERS
+    // ============================================================
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    document.querySelectorAll('.modal-overlay').forEach(o => {
+      o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+    });
+
+    function showConfirm(title, message, action) {
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmMessage').textContent = message;
+      const btn = document.getElementById('confirmActionBtn');
+      btn.onclick = () => { closeModal('confirmDialog'); action(); };
+      openModal('confirmDialog');
+    }
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function toast(msg, type = 'success') {
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      const icon = type === 'success'
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+      t.innerHTML = icon + `<span>${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => { t.style.animation = 'toastOut 0.3s ease both'; setTimeout(() => t.remove(), 300); }, 3200);
+    }
+
+    // ============================================================
+    // CONTENT CARDS TOGGLE
+    // ============================================================
+    function toggleCard(id) {
+      document.getElementById(id).classList.toggle('open');
+    }
+
+    // ============================================================
+    // TABLE FILTER
+    // ============================================================
+    function filterTable(tableId, query) {
+      const rows = document.querySelectorAll(`#${tableId} tbody tr`);
+      const q = query.toLowerCase();
+      rows.forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    // ============================================================
+    // CHART.JS CONFIG
+    // ============================================================
+    Chart.defaults.color = '#9A9080';
+    Chart.defaults.borderColor = 'rgba(201,168,76,0.08)';
+    Chart.defaults.font.family = "'Outfit', sans-serif";
+    Chart.defaults.font.size = 11;
+
+    let bookingChartInst = null;
+    let statusChartInst = null;
+
+    function renderBookingChart(labels, data) {
+      if (bookingChartInst) bookingChartInst.destroy();
+      const ctx = document.getElementById('bookingChart').getContext('2d');
+      bookingChartInst = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Bookings',
+            data,
+            backgroundColor: 'rgba(201,168,76,0.25)',
+            borderColor: '#C9A84C',
+            borderWidth: 1.5,
+            borderRadius: 4,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: 'rgba(201,168,76,0.05)' }, ticks: { precision: 0 } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function renderStatusChart(labels, data) {
+      if (statusChartInst) statusChartInst.destroy();
+      const ctx = document.getElementById('statusChart').getContext('2d');
+      statusChartInst = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data,
+            backgroundColor: ['rgba(232,168,76,0.7)', 'rgba(92,184,123,0.7)', 'rgba(224,82,82,0.7)'],
+            borderColor: ['#E8A84C', '#5CB87B', '#E05252'],
+            borderWidth: 1.5,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: { position: 'bottom', labels: { padding: 14, boxWidth: 10 } }
+          }
+        }
+      });
+    }
+
+    // ============================================================
+    // LOAD DASHBOARD
+    // ============================================================
+    async function loadDashboard() {
+      document.getElementById('lastRefreshed').textContent = 'Loading…';
+      try {
+        const data = await apiCall('/admin-panel/api/dashboard-stats/');
+        document.getElementById('statTotalBookings').textContent = data.total_bookings ?? '–';
+        document.getElementById('statTotalUsers').textContent = data.total_users ?? '–';
+        document.getElementById('statTotalEnquiries').textContent = data.total_enquiries ?? '–';
+        document.getElementById('statMonthlyBookings').textContent = data.monthly_bookings ?? '–';
+
+        if (data.booking_trend) renderBookingChart(data.booking_trend.labels, data.booking_trend.values);
+        if (data.status_breakdown) renderStatusChart(data.status_breakdown.labels, data.status_breakdown.values);
+
+        // Recent Bookings
+        const rbb = document.getElementById('recentBookingsBody');
+        if (data.recent_bookings?.length) {
+          rbb.innerHTML = data.recent_bookings.map(b => `
+        <tr>
+          <td>${b.name}</td>
+          <td>${b.event_type || '–'}</td>
+          <td><span class="badge ${b.status}">${b.status}</span></td>
+        </tr>`).join('');
+        } else {
+          rbb.innerHTML = '<tr><td colspan="3"><div class="empty-state"><p>No recent bookings</p></div></td></tr>';
+        }
+
+        // Activity Feed
+        const af = document.getElementById('activityFeed');
+        if (data.activity?.length) {
+          af.innerHTML = data.activity.map(a => `
+        <div class="activity-item">
+          <div class="activity-dot ${a.color || 'gold'}"></div>
+          <div>
+            <div class="activity-text">${a.text}</div>
+            <div class="activity-time">${a.time}</div>
+          </div>
+        </div>`).join('');
+        } else {
+          af.innerHTML = '<div class="empty-state"><p>No recent activity</p></div>';
+        }
+
+        // Badges
+        document.getElementById('badgeBookings').textContent = data.pending_bookings ?? 0;
+        document.getElementById('badgeEnquiries').textContent = data.unread_enquiries ?? 0;
+
+        document.getElementById('lastRefreshed').textContent = 'Updated ' + new Date().toLocaleTimeString();
+      } catch (e) {
+        document.getElementById('lastRefreshed').textContent = 'Error loading data';
+      }
+    }
+
+    // ============================================================
+    // LOAD BOOKINGS
+    // ============================================================
+    async function loadBookings() {
+      try {
+        const data = await apiCall('/admin-panel/api/bookings/');
+        const tbody = document.getElementById('bookingsBody');
+        if (data.bookings?.length) {
+          tbody.innerHTML = data.bookings.map((b, i) => `
+        <tr data-status="${b.status}">
+          <td>${i + 1}</td>
+          <td>${b.name}</td>
+          <td style="color:var(--text-2)">${b.email}</td>
+          <td>${b.event_type || '–'}</td>
+          <td>${b.event_date || '–'}</td>
+          <td><span class="badge ${b.status}">${b.status}</span></td>
+          <td>
+            <div class="flex-center gap-2">
+              <button class="btn btn-outline btn-sm" onclick="viewBooking(${b.id})">View</button>
+              ${b.status === 'pending' ? `
+              <button class="btn btn-success btn-sm" onclick="updateBookingStatus(${b.id},'approved')">✓</button>
+              <button class="btn btn-danger btn-sm" onclick="updateBookingStatus(${b.id},'rejected')">✗</button>` : ''}
+              <button class="btn btn-danger btn-sm btn-icon" onclick="deleteBooking(${b.id})" title="Delete">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No bookings found.</p></div></td></tr>';
+        }
+      } catch (e) { toast('Failed to load bookings', 'error'); }
+    }
+
+    function filterBookingStatus(status) {
+      const rows = document.querySelectorAll('#bookingsTable tbody tr[data-status]');
+      rows.forEach(r => r.style.display = (!status || r.dataset.status === status) ? '' : 'none');
+    }
+
+    async function viewBooking(id) {
+      const body = document.getElementById('bookingModalBody');
+      body.innerHTML = '<p style="color:var(--text-2)">Loading…</p>';
+      openModal('bookingModal');
+      try {
+        const d = await apiCall(`/admin-panel/api/bookings/${id}/`);
+        body.innerHTML = `
+      <div class="form-grid form-grid-2" style="gap:0.75rem">
+        <div><div class="text-muted mb-1">Client Name</div><strong>${d.name}</strong></div>
+        <div><div class="text-muted mb-1">Email</div><strong>${d.email}</strong></div>
+        <div><div class="text-muted mb-1">Phone</div><strong>${d.phone || '–'}</strong></div>
+        <div><div class="text-muted mb-1">Event Type</div><strong>${d.event_type || '–'}</strong></div>
+        <div><div class="text-muted mb-1">Event Date</div><strong>${d.event_date || '–'}</strong></div>
+        <div><div class="text-muted mb-1">Status</div><span class="badge ${d.status}">${d.status}</span></div>
+        <div style="grid-column:1/-1"><div class="text-muted mb-1">Message / Notes</div><p style="font-size:0.88rem;color:var(--text-2)">${d.message || 'No message'}</p></div>
+        <div><div class="text-muted mb-1">Created</div><strong>${d.created_at || '–'}</strong></div>
+      </div>`;
+        document.getElementById('modalApproveBtn').onclick = () => { closeModal('bookingModal'); updateBookingStatus(id, 'approved'); };
+        document.getElementById('modalRejectBtn').onclick = () => { closeModal('bookingModal'); updateBookingStatus(id, 'rejected'); };
+      } catch (e) { body.innerHTML = '<p style="color:var(--danger)">Failed to load booking details.</p>'; }
+    }
+
+    async function updateBookingStatus(id, status) {
+      try {
+        await apiCall(`/admin-panel/api/bookings/${id}/status/`, 'POST', { status });
+        toast(`Booking ${status} successfully`);
+        loadBookings();
+      } catch (e) { toast('Failed to update status', 'error'); }
+    }
+
+    async function deleteBooking(id) {
+      showConfirm('Delete Booking', 'Are you sure you want to permanently delete this booking?', async () => {
+        try {
+          await apiCall(`/admin-panel/api/bookings/${id}/delete/`, 'DELETE');
+          toast('Booking deleted');
+          loadBookings();
+        } catch (e) { toast('Failed to delete', 'error'); }
+      });
+    }
+
+    function exportTable(tableId, name) {
+      const rows = document.querySelectorAll(`#${tableId} tr`);
+      const csv = Array.from(rows).map(r =>
+        Array.from(r.querySelectorAll('th,td')).map(c => `"${c.innerText.replace(/"/g, '""')}"`).join(',')
+      ).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${name}_${Date.now()}.csv`;
+      a.click();
+      toast('CSV exported');
+    }
+
+    // ============================================================
+    // LOAD USERS
+    // ============================================================
+    async function loadUsers() {
+      try {
+        const data = await apiCall('/admin-panel/api/users/');
+        const tbody = document.getElementById('usersBody');
+        if (data.users?.length) {
+          tbody.innerHTML = data.users.map((u, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${u.username}</td>
+          <td style="color:var(--text-2)">${u.email}</td>
+          <td>${u.date_joined || '–'}</td>
+          <td>${u.last_login || 'Never'}</td>
+          <td><span class="badge ${u.is_active ? 'active' : 'inactive'}">${u.is_active ? 'Active' : 'Inactive'}</span></td>
+          <td>
+            <div class="flex-center gap-2">
+              <button class="btn btn-${u.is_active ? 'danger' : 'success'} btn-sm" onclick="toggleUser(${u.id},${u.is_active})">
+                ${u.is_active ? 'Deactivate' : 'Activate'}
+              </button>
+              <button class="btn btn-danger btn-sm btn-icon" onclick="deleteUser(${u.id})" title="Delete">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No users found.</p></div></td></tr>';
+        }
+      } catch (e) { toast('Failed to load users', 'error'); }
+    }
+
+    async function toggleUser(id, isActive) {
+      try {
+        await apiCall(`/admin-panel/api/users/${id}/toggle/`, 'POST', { is_active: !isActive });
+        toast(`User ${isActive ? 'deactivated' : 'activated'}`);
+        loadUsers();
+      } catch (e) { toast('Action failed', 'error'); }
+    }
+
+    async function deleteUser(id) {
+      showConfirm('Delete User', 'This will permanently delete this user and all their data.', async () => {
+        try {
+          await apiCall(`/admin-panel/api/users/${id}/delete/`, 'DELETE');
+          toast('User deleted');
+          loadUsers();
+        } catch (e) { toast('Failed to delete', 'error'); }
+      });
+    }
+
+    // ============================================================
+    // LOAD ENQUIRIES
+    // ============================================================
+    async function loadEnquiries() {
+      try {
+        const data = await apiCall('/admin-panel/api/enquiries/');
+        const tbody = document.getElementById('enquiriesBody');
+        if (data.enquiries?.length) {
+          tbody.innerHTML = data.enquiries.map((e, i) => `
+        <tr data-status="${e.is_read ? 'read' : 'unread'}">
+          <td>${i + 1}</td>
+          <td>${e.name}</td>
+          <td style="color:var(--text-2)">${e.email}</td>
+          <td>${e.subject || '–'}</td>
+          <td>${e.created_at || '–'}</td>
+          <td><span class="badge ${e.is_read ? 'read' : 'unread'}">${e.is_read ? 'Read' : 'Unread'}</span></td>
+          <td>
+            <div class="flex-center gap-2">
+              <button class="btn btn-outline btn-sm" onclick="viewEnquiry(${e.id})">View</button>
+              <button class="btn btn-danger btn-sm btn-icon" onclick="deleteEnquiry(${e.id})" title="Delete">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><p>No enquiries found.</p></div></td></tr>';
+        }
+      } catch (e) { toast('Failed to load enquiries', 'error'); }
+    }
+
+    function filterEnquiryStatus(status) {
+      const rows = document.querySelectorAll('#enquiriesTable tbody tr[data-status]');
+      rows.forEach(r => r.style.display = (!status || r.dataset.status === status) ? '' : 'none');
+    }
+
+    async function viewEnquiry(id) {
+      const body = document.getElementById('enquiryModalBody');
+      body.innerHTML = '<p style="color:var(--text-2)">Loading…</p>';
+      openModal('enquiryModal');
+      try {
+        const d = await apiCall(`/admin-panel/api/enquiries/${id}/`);
+        body.innerHTML = `
+      <div style="display:grid; gap:0.75rem">
+        <div><div class="text-muted mb-1">From</div><strong>${d.name}</strong></div>
+        <div><div class="text-muted mb-1">Email</div><a href="mailto:${d.email}" style="color:var(--gold)">${d.email}</a></div>
+        <div><div class="text-muted mb-1">Phone</div><strong>${d.phone || '–'}</strong></div>
+        <div><div class="text-muted mb-1">Subject</div><strong>${d.subject || '–'}</strong></div>
+        <div><div class="text-muted mb-1">Message</div><p style="font-size:0.88rem;color:var(--text-2);line-height:1.7;background:var(--surface-3);padding:0.75rem;border-radius:8px">${d.message}</p></div>
+        <div><div class="text-muted mb-1">Received</div><strong>${d.created_at || '–'}</strong></div>
+      </div>`;
+        document.getElementById('markReadBtn').onclick = async () => {
+          await apiCall(`/admin-panel/api/enquiries/${id}/read/`, 'POST');
+          closeModal('enquiryModal'); toast('Marked as read'); loadEnquiries();
+        };
+        document.getElementById('deleteEnquiryBtn').onclick = () => {
+          closeModal('enquiryModal'); deleteEnquiry(id);
+        };
+        if (!d.is_read) apiCall(`/admin-panel/api/enquiries/${id}/read/`, 'POST');
+      } catch (e) { body.innerHTML = '<p style="color:var(--danger)">Failed to load enquiry.</p>'; }
+    }
+
+    async function deleteEnquiry(id) {
+      showConfirm('Delete Enquiry', 'Permanently delete this enquiry message?', async () => {
+        try {
+          await apiCall(`/admin-panel/api/enquiries/${id}/delete/`, 'DELETE');
+          toast('Enquiry deleted');
+          loadEnquiries();
+        } catch (e) { toast('Failed to delete', 'error'); }
+      });
+    }
+
+    // ============================================================
+    // CONTENT MANAGER
+    // ============================================================
+    async function loadContent() {
+      try {
+        const data = await apiCall('/admin-panel/api/content/');
+        if (data.about) {
+          document.getElementById('aboutHeading').value = data.about.heading || '';
+          document.getElementById('aboutSub').value = data.about.subheading || '';
+          document.getElementById('aboutBody').value = data.about.body || '';
+          document.getElementById('aboutWelcome').value = data.about.welcome_text || '';
+        }
+        if (data.contact) {
+          document.getElementById('contactPhone').value = data.contact.phone || '';
+          document.getElementById('contactEmail').value = data.contact.email || '';
+          document.getElementById('contactAddress').value = data.contact.address || '';
+          document.getElementById('contactWhatsapp').value = data.contact.whatsapp || '';
+          document.getElementById('contactInstagram').value = data.contact.instagram || '';
+          document.getElementById('contactFacebook').value = data.contact.facebook || '';
+        }
+        if (data.corporart) {
+          document.getElementById('corporartTitle').value = data.corporart.title || '';
+          document.getElementById('corporartDesc').value = data.corporart.desc || '';
+        }
+        if (data.hero_slides) renderHeroSlides(data.hero_slides);
+      } catch (e) { }
+    }
+
+    function renderHeroSlides(slides = []) {
+      const container = document.getElementById('heroSlides');
+      container.innerHTML = slides.map((s, i) => `
+    <div style="background:var(--surface-3);border:1px solid var(--gold-border);border-radius:var(--radius-sm);padding:1rem;margin-bottom:0.75rem">
+      <div class="flex-between mb-1">
+        <span style="font-size:0.78rem;color:var(--text-2)">Slide ${i + 1}</span>
+        <button class="btn btn-danger btn-sm" onclick="removeHeroSlide(this)">Remove</button>
+      </div>
+      <div class="form-grid form-grid-2" style="gap:0.5rem">
+        <div class="field-group"><label>Heading</label><input type="text" class="dash-input" value="${s.heading || ''}" placeholder="Slide heading"></div>
+        <div class="field-group"><label>Subheading</label><input type="text" class="dash-input" value="${s.subheading || ''}" placeholder="Slide subheading"></div>
+        <div class="field-group"><label>CTA Text</label><input type="text" class="dash-input" value="${s.cta || ''}" placeholder="Book Now"></div>
+        <div class="field-group"><label>CTA Link</label><input type="text" class="dash-input" value="${s.link || ''}" placeholder="/contact/"></div>
+      </div>
+    </div>`).join('');
+    }
+
+    function addHeroSlide() {
+      const container = document.getElementById('heroSlides');
+      const count = container.children.length + 1;
+      const div = document.createElement('div');
+      div.style.cssText = 'background:var(--surface-3);border:1px solid var(--gold-border);border-radius:8px;padding:1rem;margin-bottom:0.75rem';
+      div.innerHTML = `
+    <div class="flex-between mb-1">
+      <span style="font-size:0.78rem;color:var(--text-2)">Slide ${count}</span>
+      <button class="btn btn-danger btn-sm" onclick="removeHeroSlide(this)">Remove</button>
+    </div>
+    <div class="form-grid form-grid-2" style="gap:0.5rem">
+      <div class="field-group"><label>Heading</label><input type="text" class="dash-input" placeholder="Slide heading"></div>
+      <div class="field-group"><label>Subheading</label><input type="text" class="dash-input" placeholder="Slide subheading"></div>
+      <div class="field-group"><label>CTA Text</label><input type="text" class="dash-input" placeholder="Book Now"></div>
+      <div class="field-group"><label>CTA Link</label><input type="text" class="dash-input" placeholder="/contact/"></div>
+    </div>`;
+      container.appendChild(div);
+    }
+
+    function removeHeroSlide(btn) { btn.closest('[style]').remove(); }
+    async function clearContent(section) {
+      showConfirm('Clear Content', 'Are you sure you want to clear all ' + section + ' content?', async () => {
+        if (section === 'about') {
+          document.getElementById('aboutHeading').value = '';
+          document.getElementById('aboutSub').value = '';
+          document.getElementById('aboutWelcome').value = '';
+          document.getElementById('aboutBody').value = '';
+          await saveContent('about');
+          toast('About content cleared');
+        } else if (section === 'contact') {
+          document.getElementById('contactPhone').value = '';
+          document.getElementById('contactEmail').value = '';
+          document.getElementById('contactAddress').value = '';
+          document.getElementById('contactWhatsapp').value = '';
+          document.getElementById('contactInstagram').value = '';
+          document.getElementById('contactFacebook').value = '';
+          await saveContent('contact');
+          toast('Contact info cleared');
+        } else if (section === 'corporart') {
+          document.getElementById('corporartTitle').value = '';
+          document.getElementById('corporartDesc').value = '';
+          await saveContent('corporart');
+          toast('CorporART content cleared');
+        }
+      });
+    }
+    async function saveContent(section) {
+      let payload = {};
+      if (section === 'hero') {
+        const slides = [];
+        document.querySelectorAll('#heroSlides > div').forEach(s => {
+          const inputs = s.querySelectorAll('input');
+          slides.push({ heading: inputs[0]?.value, subheading: inputs[1]?.value, cta: inputs[2]?.value, link: inputs[3]?.value });
+        });
+        payload = { hero_slides: slides };
+      } else if (section === 'about') {
+        payload = {
+          about: {
+            heading: document.getElementById('aboutHeading').value,
+            subheading: document.getElementById('aboutSub').value,
+            body: document.getElementById('aboutBody').value,
+            welcome_text: document.getElementById('aboutWelcome').value,
+          }
+        };
+      } else if (section === 'contact') {
+        payload = {
+          contact: {
+            phone: document.getElementById('contactPhone').value,
+            email: document.getElementById('contactEmail').value,
+            address: document.getElementById('contactAddress').value,
+            whatsapp: document.getElementById('contactWhatsapp').value,
+            instagram: document.getElementById('contactInstagram').value,
+            facebook: document.getElementById('contactFacebook').value,
+          }
+        };
+      } else if (section === 'corporart') {
+        payload = {
+          corporart: {
+            title: document.getElementById('corporartTitle').value,
+            desc: document.getElementById('corporartDesc').value,
+          }
+        };
+      }
+
+      try {
+        await apiCall('/admin-panel/api/content/save/', 'POST', payload);
+        toast(`${section.charAt(0).toUpperCase() + section.slice(1)} saved successfully`);
+      } catch (e) { toast('Failed to save content', 'error'); }
+    }
+
+    // ============================================================
+    // IMAGES
+    // ============================================================
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewGrid = document.getElementById('imagePreviewGrid');
+    let selectedFiles = [];
+
+    uploadZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', handleFileSelect);
+    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+    uploadZone.addEventListener('drop', e => {
+      e.preventDefault(); uploadZone.classList.remove('drag-over');
+      handleFiles(e.dataTransfer.files);
+    });
+
+    function handleFileSelect(e) { handleFiles(e.target.files); }
+
+    function handleFiles(files) {
+      Array.from(files).forEach(f => {
+        if (!f.type.startsWith('image/')) return;
+        selectedFiles.push(f);
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const d = document.createElement('div'); d.className = 'image-thumb';
+          d.innerHTML = `<img src="${ev.target.result}" alt="${f.name}">
+        <button class="image-thumb-del" onclick="this.parentElement.remove(); selectedFiles.splice(selectedFiles.indexOf(f),1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>`;
+          previewGrid.appendChild(d);
+        };
+        reader.readAsDataURL(f);
+      });
+    }
+
+    async function uploadImages() {
+      if (!selectedFiles.length) { toast('Select images first', 'error'); return; }
+      const category = document.getElementById('imgCategory').value;
+      const fd = new FormData();
+      selectedFiles.forEach(f => fd.append('images', f));
+      fd.append('category', category);
+      try {
+        const res = await fetch('/admin-panel/api/images/upload/', {
+          method: 'POST',
+          headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+          body: fd
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast(`${selectedFiles.length} image(s) uploaded`);
+          selectedFiles = [];
+          previewGrid.innerHTML = '';
+          loadImages(category);
+        } else { toast(data.error || 'Upload failed', 'error'); }
+      } catch (e) { toast('Upload error', 'error'); }
+    }
+
+    async function loadImages(category) {
+      const grid = document.getElementById('existingImagesGrid');
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>Loading…</p></div>';
+      try {
+        const data = await apiCall(`/admin-panel/api/images/?category=${category}`);
+        if (data.images?.length) {
+          grid.innerHTML = data.images.map(img => `
+        <div class="image-thumb">
+          <img src="${img.url}" alt="${img.name}" loading="lazy">
+          <button class="image-thumb-del" onclick="deleteImage(${img.id}, this)" title="Delete">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>`).join('');
+        } else {
+          grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><p>No images in this category</p></div>';
+        }
+      } catch (e) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>Failed to load images</p></div>'; }
+    }
+
+    async function deleteImage(id, btn) {
+      showConfirm('Delete Image', 'Permanently delete this image?', async () => {
+        try {
+          await apiCall(`/admin-panel/api/images/${id}/delete/`, 'DELETE');
+          btn.closest('.image-thumb').remove();
+          toast('Image deleted');
+        } catch (e) { toast('Failed to delete', 'error'); }
+      });
+    }
+
+    // ============================================================
+    // SERVICES
+    // ============================================================
+    async function loadServices() {
+      try {
+        const data = await apiCall('/admin-panel/api/services/');
+        const tbody = document.getElementById('servicesBody');
+        if (data.services?.length) {
+          tbody.innerHTML = data.services.map((s, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${s.name}</td>
+          <td style="color:var(--text-2);max-width:220px">${(s.description || '').slice(0, 80)}…</td>
+          <td>${s.price ? '₹' + Number(s.price).toLocaleString('en-IN') : '–'}</td>
+          <td><span class="badge ${s.is_active ? 'approved' : 'rejected'}">${s.is_active ? 'Active' : 'Off'}</span></td>
+          <td>
+            <div class="flex-center gap-2">
+              <button class="btn btn-outline btn-sm" onclick="editService(${s.id})">Edit</button>
+              <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('services',${s.id})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>No services yet. Add one!</p></div></td></tr>';
+        }
+      } catch (e) { toast('Failed to load services', 'error'); }
+    }
+
+    async function editService(id) {
+      const data = await apiCall(`/admin-panel/api/services/${id}/`);
+      document.getElementById('serviceId').value = id;
+      document.getElementById('serviceName').value = data.name || '';
+      document.getElementById('servicePrice').value = data.price || '';
+      document.getElementById('serviceDesc').value = data.description || '';
+      document.getElementById('serviceActive').checked = data.is_active ?? true;
+      document.getElementById('serviceModalTitle').textContent = 'Edit Service';
+      openModal('serviceModal');
+    }
+
+    async function saveService() {
+      const id = document.getElementById('serviceId').value;
+      const payload = {
+        name: document.getElementById('serviceName').value,
+        price: document.getElementById('servicePrice').value,
+        description: document.getElementById('serviceDesc').value,
+        is_active: document.getElementById('serviceActive').checked,
+      };
+      if (!payload.name) { toast('Service name required', 'error'); return; }
+      try {
+        const url = id ? `/admin-panel/api/services/${id}/update/` : '/admin-panel/api/services/create/';
+        await apiCall(url, 'POST', payload);
+        closeModal('serviceModal');
+        toast(`Service ${id ? 'updated' : 'created'}`);
+        document.getElementById('serviceId').value = '';
+        document.getElementById('serviceModalTitle').textContent = 'Add Service';
+        loadServices();
+      } catch (e) { toast('Failed to save service', 'error'); }
+    }
+
+    // ============================================================
+    // PORTFOLIO
+    // ============================================================
+    async function loadPortfolio() {
+      try {
+        const data = await apiCall('/admin-panel/api/portfolio/');
+        const tbody = document.getElementById('portfolioBody');
+        if (data.items?.length) {
+          tbody.innerHTML = data.items.map((p, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${p.title}</td>
+          <td><span class="badge read">${p.category || '–'}</span></td>
+          <td>${p.date || '–'}</td>
+          <td><span class="badge ${p.is_featured ? 'approved' : 'inactive'}">${p.is_featured ? 'Yes' : 'No'}</span></td>
+          <td>
+            <div class="flex-center gap-2">
+              <button class="btn btn-outline btn-sm" onclick="editPortfolio(${p.id})">Edit</button>
+              <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('portfolio',${p.id})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>No portfolio items yet.</p></div></td></tr>';
+        }
+      } catch (e) { }
+    }
+
+    async function editPortfolio(id) {
+      const data = await apiCall(`/admin-panel/api/portfolio/${id}/`);
+      document.getElementById('portfolioId').value = id;
+      document.getElementById('portfolioTitle').value = data.title || '';
+      document.getElementById('portfolioCategory').value = data.category || '';
+      document.getElementById('portfolioDate').value = data.date || '';
+      document.getElementById('portfolioDesc').value = data.description || '';
+      document.getElementById('portfolioFeatured').checked = data.is_featured ?? false;
+      document.getElementById('portfolioModalTitle').textContent = 'Edit Work';
+      openModal('portfolioModal');
+    }
+
+    async function savePortfolio() {
+      const id = document.getElementById('portfolioId').value;
+      const fd = new FormData();
+      fd.append('title', document.getElementById('portfolioTitle').value);
+      fd.append('category', document.getElementById('portfolioCategory').value);
+      fd.append('date', document.getElementById('portfolioDate').value);
+      fd.append('description', document.getElementById('portfolioDesc').value);
+      fd.append('video_id', document.getElementById('portfolioVideoId').value);
+      fd.append('is_featured', document.getElementById('portfolioFeatured').checked);
+      const imageFile = document.getElementById('portfolioImage').files[0];
+      if (imageFile) fd.append('image', imageFile);
+
+      if (!fd.get('title')) { toast('Title required', 'error'); return; }
+      try {
+        const url = id ? `/admin-panel/api/portfolio/${id}/update/` : '/admin-panel/api/portfolio/create/';
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+          body: fd
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeModal('portfolioModal');
+          toast(`Portfolio item ${id ? 'updated' : 'created'}`);
+          document.getElementById('portfolioId').value = '';
+          document.getElementById('portfolioImage').value = '';
+          document.getElementById('portfolioModalTitle').textContent = 'Add Portfolio Work';
+          loadPortfolio();
+        } else {
+          toast(data.error || 'Failed to save', 'error');
+        }
+      } catch (e) { toast('Failed to save', 'error'); }
+    }
+
+    // ============================================================
+    // TESTIMONIALS
+    // ============================================================
+    async function loadTestimonials() {
+      try {
+        const data = await apiCall('/admin-panel/api/testimonials/');
+        const tbody = document.getElementById('testimonialsBody');
+        if (data.testimonials?.length) {
+          tbody.innerHTML = data.testimonials.map((t, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${t.name}</td>
+          <td style="max-width:200px;color:var(--text-2)">"${(t.quote || '').slice(0, 60)}…"</td>
+          <td>${'★'.repeat(t.rating || 5)}</td>
+          <td><span class="badge ${t.is_active ? 'approved' : 'inactive'}">${t.is_active ? 'Active' : 'Hidden'}</span></td>
+          <td>
+            <div class="flex-center gap-2">
+              <button class="btn btn-outline btn-sm" onclick="editTestimonial(${t.id})">Edit</button>
+              <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('testimonials',${t.id})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>No testimonials yet.</p></div></td></tr>';
+        }
+      } catch (e) { }
+    }
+
+    async function editTestimonial(id) {
+      const data = await apiCall(`/admin-panel/api/testimonials/${id}/`);
+      document.getElementById('testimonialId').value = id;
+      document.getElementById('testimonialName').value = data.name || '';
+      document.getElementById('testimonialEvent').value = data.event_type || '';
+      document.getElementById('testimonialQuote').value = data.quote || '';
+      document.getElementById('testimonialRating').value = data.rating || 5;
+      document.getElementById('testimonialModalTitle').textContent = 'Edit Testimonial';
+      openModal('testimonialModal');
+    }
+
+    async function saveTestimonial() {
+      const id = document.getElementById('testimonialId').value;
+      const payload = {
+        name: document.getElementById('testimonialName').value,
+        event_type: document.getElementById('testimonialEvent').value,
+        quote: document.getElementById('testimonialQuote').value,
+        rating: document.getElementById('testimonialRating').value,
+      };
+      if (!payload.name || !payload.quote) { toast('Name and quote required', 'error'); return; }
+      try {
+        const url = id ? `/admin-panel/api/testimonials/${id}/update/` : '/admin-panel/api/testimonials/create/';
+        await apiCall(url, 'POST', payload);
+        closeModal('testimonialModal');
+        toast('Testimonial saved');
+        document.getElementById('testimonialId').value = '';
+        loadTestimonials();
+      } catch (e) { toast('Failed to save', 'error'); }
+    }
+
+    // ============================================================
+    // TEAM
+    // ============================================================
+    async function loadTeam() {
+      try {
+        const data = await apiCall('/admin-panel/api/team/');
+        const tbody = document.getElementById('teamBody');
+        if (data.members?.length) {
+          tbody.innerHTML = data.members.map((m, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${m.name}</td>
+          <td style="color:var(--gold)">${m.role || '–'}</td>
+          <td style="color:var(--text-2)">${m.email || '–'}</td>
+          <td><span class="badge ${m.is_active ? 'active' : 'inactive'}">${m.is_active ? 'Active' : 'Hidden'}</span></td>
+          <td>
+            <div class="flex-center gap-2">
+              <button class="btn btn-outline btn-sm" onclick="editTeam(${m.id})">Edit</button>
+              <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('team',${m.id})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>No team members yet.</p></div></td></tr>';
+        }
+      } catch (e) { }
+    }
+
+    async function editTeam(id) {
+      const data = await apiCall(`/admin-panel/api/team/${id}/`);
+      document.getElementById('teamId').value = id;
+      document.getElementById('teamName').value = data.name || '';
+      document.getElementById('teamRole').value = data.role || '';
+      document.getElementById('teamEmail').value = data.email || '';
+      document.getElementById('teamPhone').value = data.phone || '';
+      document.getElementById('teamBio').value = data.bio || '';
+      document.getElementById('teamModalTitle').textContent = 'Edit Team Member';
+      openModal('teamModal');
+    }
+
+    async function saveTeamMember() {
+      const id = document.getElementById('teamId').value;
+      const fd = new FormData();
+      fd.append('name', document.getElementById('teamName').value);
+      fd.append('role', document.getElementById('teamRole').value);
+      fd.append('email', document.getElementById('teamEmail').value);
+      fd.append('phone', document.getElementById('teamPhone').value);
+      fd.append('bio', document.getElementById('teamBio').value);
+      const photoFile = document.getElementById('teamPhoto').files[0];
+      if (photoFile) fd.append('photo', photoFile);
+
+      if (!fd.get('name')) { toast('Name required', 'error'); return; }
+      try {
+        const url = id ? `/admin-panel/api/team/${id}/update/` : '/admin-panel/api/team/create/';
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+          body: fd
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeModal('teamModal');
+          toast('Team member saved');
+          document.getElementById('teamId').value = '';
+          document.getElementById('teamPhoto').value = '';
+          document.getElementById('teamModalTitle').textContent = 'Add Team Member';
+          loadTeam();
+        } else {
+          toast(data.error || 'Failed to save', 'error');
+        }
+      } catch (e) { toast('Failed to save', 'error'); }
+    }
+    // ============================================================
+    // CLIENTS
+    // ============================================================
+    async function loadClients() {
+      try {
+        const data = await apiCall('/admin-panel/api/clients/');
+        const tbody = document.getElementById('clientsBody');
+        if (data.clients?.length) {
+          tbody.innerHTML = data.clients.map((c, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${c.name}</td>
+          <td><span class="badge ${c.is_partner ? 'approved' : 'read'}">${c.is_partner ? 'Partner' : 'Client'}</span></td>
+          <td><span class="badge ${c.is_active ? 'active' : 'inactive'}">${c.is_active ? 'Active' : 'Hidden'}</span></td>
+          <td>
+            <div class="flex-center gap-2">
+              <button class="btn btn-outline btn-sm" onclick="editClient(${c.id})">Edit</button>
+              <button class="btn btn-danger btn-sm btn-icon" onclick="deleteRecord('clients',${c.id})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>`).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>No clients yet.</p></div></td></tr>';
+        }
+      } catch (e) { toast('Failed to load clients', 'error'); }
+    }
+
+    async function editClient(id) {
+      const data = await apiCall(`/admin-panel/api/clients/${id}/`);
+      document.getElementById('clientId').value = id;
+      document.getElementById('clientName').value = data.name || '';
+      document.getElementById('clientOrder').value = data.order || 0;
+      document.getElementById('clientIsPartner').checked = data.is_partner ?? false;
+      document.getElementById('clientIsActive').checked = data.is_active ?? true;
+      document.getElementById('clientModalTitle').textContent = 'Edit Client';
+      openModal('clientModal');
+    }
+
+    async function saveClient() {
+      const id = document.getElementById('clientId').value;
+      const fd = new FormData();
+      fd.append('name', document.getElementById('clientName').value);
+      fd.append('order', document.getElementById('clientOrder').value);
+      fd.append('is_partner', document.getElementById('clientIsPartner').checked);
+      fd.append('is_active', document.getElementById('clientIsActive').checked);
+      const logoFile = document.getElementById('clientLogo').files[0];
+      if (logoFile) fd.append('logo', logoFile);
+
+      if (!fd.get('name')) { toast('Client name required', 'error'); return; }
+      try {
+        const url = id ? `/admin-panel/api/clients/${id}/update/` : '/admin-panel/api/clients/create/';
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
+          body: fd
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeModal('clientModal');
+          toast('Client saved');
+          document.getElementById('clientId').value = '';
+          document.getElementById('clientLogo').value = '';
+          document.getElementById('clientModalTitle').textContent = 'Add Client';
+          loadClients();
+        } else {
+          toast(data.error || 'Failed to save', 'error');
+        }
+      } catch (e) { toast('Failed to save', 'error'); }
+    }
+    // ============================================================
+    // GENERIC DELETE
+    // ============================================================
+    async function deleteRecord(resource, id) {
+      showConfirm('Delete Record', 'Permanently delete this record?', async () => {
+        try {
+          await apiCall(`/admin-panel/api/${resource}/${id}/delete/`, 'DELETE');
+          toast('Record deleted');
+          const loaders = { services: loadServices, portfolio: loadPortfolio, testimonials: loadTestimonials, team: loadTeam, clients: loadClients };
+          loaders[resource]?.();
+        } catch (e) { toast('Failed to delete', 'error'); }
+      });
+    }
+
+    // ============================================================
+    // SETTINGS
+    // ============================================================
+    async function loadSettings() {
+      try {
+        const data = await apiCall('/admin-panel/api/settings/');
+        if (data.general) {
+          document.getElementById('siteName').value = data.general.site_name || '';
+          document.getElementById('siteTagline').value = data.general.tagline || '';
+          document.getElementById('siteEmail').value = data.general.email || '';
+          document.getElementById('sitePhone').value = data.general.phone || '';
+        }
+        if (data.access) {
+          document.getElementById('maintenanceMode').checked = data.access.maintenance_mode ?? false;
+          document.getElementById('bookingEnabled').checked = data.access.booking_enabled ?? true;
+        }
+      } catch (e) { }
+    }
+
+    async function saveSettings(type) {
+      let payload = {};
+      if (type === 'general') {
+        payload = {
+          general: {
+            site_name: document.getElementById('siteName').value,
+            tagline: document.getElementById('siteTagline').value,
+            email: document.getElementById('siteEmail').value,
+            phone: document.getElementById('sitePhone').value,
+          }
+        };
+      } else if (type === 'access') {
+        payload = {
+          access: {
+            maintenance_mode: document.getElementById('maintenanceMode').checked,
+            booking_enabled: document.getElementById('bookingEnabled').checked,
+          }
+        };
+      }
+      try {
+        await apiCall('/admin-panel/api/settings/save/', 'POST', payload);
+        toast('Settings saved');
+      } catch (e) { toast('Failed to save settings', 'error'); }
+    }
+
+    // ============================================================
+    // REFRESH BUTTON
+    // ============================================================
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      loadSection(activeSection);
+      toast('Data refreshed');
+    });
+
+    // ============================================================
+    // INIT — SET USER AVATAR INITIALS
+    // ============================================================
+    (function init() {
+      const name = document.getElementById('userName')?.textContent || 'Admin';
+      const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      document.getElementById('userAvatar').textContent = initials;
+
+      // Load dashboard on start
+      loadDashboard();
+
+      // Responsive settings grid
+      const mq = window.matchMedia('(max-width:768px)');
+      function checkMQ(e) {
+        const sg = document.querySelector('.settings-grid');
+        if (sg) sg.style.gridTemplateColumns = e.matches ? '1fr' : '1fr 1fr';
+        const dt = document.getElementById('dashTableGrid');
+        if (dt) dt.style.gridTemplateColumns = e.matches ? '1fr' : '1fr 1fr';
+      }
+      mq.addEventListener('change', checkMQ);
+      checkMQ(mq);
+    })();
+  </script>
+</body>
+
+</html>

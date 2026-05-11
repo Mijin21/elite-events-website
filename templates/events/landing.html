@@ -1,0 +1,2738 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elite Events — India's Premier Event Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@200;300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e2c97e;
+      --gold-dim: #7a6030;
+      --black: #0a0a0a;
+      --black2: #0f0f0f;
+      --black3: #141414;
+      --white: #f0f0ea;
+      --muted: #777770;
+      --muted2: #333330;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── SCROLL PROGRESS ─────────────────────── */
+    #scrollProgress {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 3px;
+      height: 0%;
+      background: linear-gradient(to bottom, var(--gold), var(--gold-light));
+      z-index: 9999;
+      transition: height 0.1s linear;
+    }
+
+    /* ── CURSOR ──────────────────────────────── */
+    #curDot {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--white);
+      mix-blend-mode: difference;
+      transform: translate(-50%, -50%);
+      transition: transform .1s;
+    }
+
+    #curRing {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9997;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(201, 168, 76, .5);
+      transform: translate(-50%, -50%);
+      transition: width .25s, height .25s, border-color .25s, background .25s;
+    }
+
+    #curRing.hov {
+      width: 52px;
+      height: 52px;
+      border-color: var(--gold);
+      background: rgba(201, 168, 76, .06);
+    }
+
+    #curRing.clk {
+      transform: translate(-50%, -50%) scale(.82);
+    }
+
+    /* ── NAV ─────────────────────────────────── */
+    #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 48px;
+      transition: padding .4s ease, background .4s ease, backdrop-filter .4s ease, border-color .4s ease;
+      border-bottom: 1px solid transparent;
+    }
+
+    #navbar.scrolled {
+      padding: 14px 48px;
+      background: rgba(10, 10, 10, .94);
+      backdrop-filter: blur(20px);
+      border-bottom-color: rgba(255, 255, 255, .06);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+    }
+
+    .nav-logo-text span {
+      color: var(--gold);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: .65rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: rgba(240, 240, 234, 0.96);
+      text-decoration: none;
+      position: relative;
+      padding-bottom: 3px;
+      transition: color .3s;
+      cursor: none;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+      font-weight: 400;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--gold);
+      transition: width .35s cubic-bezier(.23, 1, .32, 1);
+    }
+
+    .nav-links a:hover {
+      color: var(--gold-light);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-links a.active {
+      color: var(--gold-light);
+    }
+
+    .nav-links a.active::after {
+      width: 100%;
+    }
+
+    .nav-cta {
+      padding: .55rem 1.4rem;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold-light);
+      font-size: .6rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: none;
+      transition: all .35s cubic-bezier(.23, 1, .32, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .35s cubic-bezier(.23, 1, .32, 1);
+      z-index: -1;
+    }
+
+    .nav-cta:hover {
+      color: #0a0a0a;
+      border-color: var(--gold);
+    }
+
+    .nav-cta:hover::before {
+      transform: scaleX(1);
+    }
+
+    /* Hamburger — always visible */
+    .ham-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: none;
+      padding: 6px;
+      flex-shrink: 0;
+    }
+
+    .ham-line {
+      width: 22px;
+      height: 1.5px;
+      background: var(--white);
+      transition: .38s cubic-bezier(.23, 1, .32, 1);
+      display: block;
+    }
+
+    .ham-btn.open .ham-line:nth-child(1) {
+      transform: translateY(6.5px) rotate(45deg);
+    }
+
+    .ham-btn.open .ham-line:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    .ham-btn.open .ham-line:nth-child(3) {
+      transform: translateY(-6.5px) rotate(-45deg);
+    }
+
+    /* ── OVERLAY MENU ──────────────────────────── */
+    #mobileMenu {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #mobileMenu.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #mMenuClose {
+      position: absolute;
+      top: 2rem;
+      right: 2.5rem;
+      width: 48px;
+      height: 48px;
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      cursor: none;
+      color: #e8e8e8;
+      transition: border-color 0.3s, transform 0.4s, color 0.3s;
+      font-size: 0;
+    }
+
+    #mMenuClose:hover {
+      border-color: var(--gold);
+      color: var(--gold-light);
+      transform: rotate(90deg);
+    }
+
+    #overlayNav {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      text-align: center;
+    }
+
+    .overlay-link {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 5vw, 4.5rem);
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      color: #555;
+      text-transform: uppercase;
+      text-decoration: none;
+      line-height: 1.5;
+      display: block;
+      cursor: none;
+      position: relative;
+      transition: color 0.3s, letter-spacing 0.4s;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .overlay-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 1px;
+      background: var(--gold);
+      transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .overlay-link:hover {
+      color: #fff;
+      letter-spacing: 0.22em;
+    }
+
+    .overlay-link:hover::after {
+      width: 100%;
+    }
+
+    .overlay-link.active-link {
+      color: var(--gold-light);
+    }
+
+    #mobileMenu.open .overlay-link {
+      opacity: 1;
+      transform: none;
+    }
+
+    #mobileMenu.open .overlay-link:nth-child(1) {
+      transition: color .3s, letter-spacing .4s, opacity .5s .10s, transform .5s .10s;
+    }
+
+    #mobileMenu.open .overlay-link:nth-child(2) {
+      transition: color .3s, letter-spacing .4s, opacity .5s .18s, transform .5s .18s;
+    }
+
+    #mobileMenu.open .overlay-link:nth-child(3) {
+      transition: color .3s, letter-spacing .4s, opacity .5s .26s, transform .5s .26s;
+    }
+
+    #mobileMenu.open .overlay-link:nth-child(4) {
+      transition: color .3s, letter-spacing .4s, opacity .5s .34s, transform .5s .34s;
+    }
+
+    #mobileMenu.open .overlay-link:nth-child(5) {
+      transition: color .3s, letter-spacing .4s, opacity .5s .42s, transform .5s .42s;
+    }
+
+    #overlayBottomDeco {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* ── HERO ─────────────────────────────────── */
+    .hero {
+      height: 100vh;
+      min-height: 700px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      padding: 0 2rem;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      transform-origin: center;
+    }
+
+    .hero-bg-slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      background-size: cover;
+      background-position: center;
+      transition: opacity 1.8s cubic-bezier(.4, 0, .2, 1);
+      transform-origin: center;
+      animation: none;
+    }
+
+    .hero-bg-slide.active {
+      opacity: 1;
+      animation: kenBurns 14s ease-out forwards;
+    }
+
+    @keyframes kenBurns {
+      from {
+        transform: scale(1.06);
+      }
+
+      to {
+        transform: scale(1.0);
+      }
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(to bottom,
+          rgba(10, 10, 10, .3) 0%,
+          rgba(10, 10, 10, .5) 50%,
+          rgba(10, 10, 10, .88) 100%);
+      animation: overlayFadeIn 1.2s ease forwards;
+    }
+
+    @keyframes overlayFadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .58rem;
+      letter-spacing: .45em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1.8rem;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    .hero-badge-line {
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 7.5rem);
+      font-weight: 400;
+      line-height: 1.02;
+      letter-spacing: -.015em;
+      color: var(--white);
+      margin-bottom: 1.6rem;
+      opacity: 0;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .hero-sub {
+      font-size: clamp(.82rem, 1.5vw, .95rem);
+      letter-spacing: .08em;
+      color: var(--muted);
+      line-height: 1.85;
+      max-width: 480px;
+      margin: 0 auto 2.8rem;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .btn-primary {
+      padding: .85rem 2.2rem;
+      background: var(--gold);
+      color: #0a0a0a;
+      font-size: .63rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      font-weight: 600;
+      border: none;
+      cursor: none;
+      transition: all .35s cubic-bezier(.23, 1, .32, 1);
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold-light);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .35s cubic-bezier(.23, 1, .32, 1);
+      z-index: 0;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(201, 168, 76, .3);
+    }
+
+    .btn-primary:hover::after {
+      transform: scaleX(1);
+    }
+
+    .btn-primary span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-outline {
+      padding: .85rem 2.2rem;
+      border: 1px solid rgba(255, 255, 255, .25);
+      color: var(--white);
+      background: none;
+      font-size: .63rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      cursor: none;
+      transition: all .35s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold-light);
+    }
+
+    /* Hero stats */
+    .hero-stats {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .hero-stat {
+      padding: 1.2rem 3rem;
+      border: 1px solid rgba(201, 168, 76, 0.28);
+      background: rgba(5, 5, 5, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      text-align: center;
+    }
+
+    .hero-stat:not(:last-child) {
+      border-right: none;
+    }
+
+    .hero-stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      color: #e2c97e;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .hero-stat-label {
+      font-size: .55rem;
+      letter-spacing: .22em;
+      color: rgba(240, 240, 234, 0.92);
+      text-transform: uppercase;
+      margin-top: 6px;
+      font-weight: 400;
+    }
+
+    /* Reel dots */
+    .hero-dots {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      display: flex;
+      gap: .5rem;
+    }
+
+    .hero-dot {
+      width: 20px;
+      height: 1.5px;
+      background: rgba(255, 255, 255, .2);
+      border: none;
+      cursor: none;
+      transition: all .4s;
+    }
+
+    .hero-dot.active {
+      background: var(--gold);
+      width: 36px;
+    }
+
+    /* ── SECTIONS ─────────────────────────────── */
+    .section-label {
+      font-size: .58rem;
+      letter-spacing: .4em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .section-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.12;
+    }
+
+    .section-heading em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    /* ── REVEAL ───────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(36px);
+    }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+
+    .reveal-right {
+      opacity: 0;
+      transform: translateX(40px);
+    }
+
+    .reveal-scale {
+      opacity: 0;
+      transform: scale(.94);
+    }
+
+    /* ── EVENT TYPES ─────────────────────────── */
+    .event-card {
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      background: var(--black3);
+      transition: transform .5s cubic-bezier(.23, 1, .32, 1);
+    }
+
+    .event-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .event-card-img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      transition: transform .7s cubic-bezier(.23, 1, .32, 1), filter .5s;
+      filter: brightness(.75) saturate(1.1);
+    }
+
+    .event-card:hover .event-card-img {
+      transform: scale(1.06);
+      filter: brightness(.9) saturate(1.25);
+    }
+
+    .event-card-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--gold);
+      color: #0a0a0a;
+      font-size: .5rem;
+      letter-spacing: .2em;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: .3rem .7rem;
+    }
+
+    .event-card-body {
+      padding: 1.6rem;
+    }
+
+    .event-card-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: rgba(201, 168, 76, .12);
+      border: 1px solid rgba(201, 168, 76, .2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .event-card-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .event-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: .6rem;
+      letter-spacing: -.01em;
+    }
+
+    .event-card-desc {
+      font-size: .78rem;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 1.2rem;
+    }
+
+    .event-card-link {
+      font-size: .6rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      cursor: none;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      transition: gap .3s;
+    }
+
+    .event-card-link:hover {
+      gap: .9rem;
+    }
+
+    /* ── SERVICES ─────────────────────────────── */
+    .service-card {
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, .06);
+      background: rgba(255, 255, 255, .02);
+      backdrop-filter: blur(4px);
+      transition: border-color .4s, background .4s, transform .4s cubic-bezier(.23, 1, .32, 1), box-shadow .4s;
+      cursor: none;
+    }
+
+    .service-card:hover {
+      border-color: rgba(201, 168, 76, .25);
+      background: rgba(201, 168, 76, .04);
+      transform: translateY(-5px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, .4), 0 0 0 1px rgba(201, 168, 76, .1);
+    }
+
+    .service-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(201, 168, 76, .2);
+      background: rgba(201, 168, 76, .06);
+    }
+
+    .service-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .service-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--white);
+      margin-bottom: .6rem;
+    }
+
+    .service-desc {
+      font-size: .77rem;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    /* ── GALLERY ──────────────────────────────── */
+    .gal-item {
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      background: var(--black2);
+    }
+
+    .gal-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform .7s cubic-bezier(.23, 1, .32, 1), filter .5s;
+      filter: brightness(.72) saturate(1.05);
+      display: block;
+    }
+
+    .gal-item:hover img {
+      transform: scale(1.07);
+      filter: brightness(.88) saturate(1.3);
+    }
+
+    .gal-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10, 10, 10, .88) 0%, rgba(10, 10, 10, .1) 55%, transparent 100%);
+      opacity: 0;
+      transition: opacity .4s;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.2rem;
+    }
+
+    .gal-item:hover .gal-overlay {
+      opacity: 1;
+    }
+
+    .gal-cat {
+      font-size: .52rem;
+      letter-spacing: .28em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: .25rem;
+      transform: translateY(8px);
+      transition: transform .4s .05s, opacity .4s .05s;
+      opacity: 0;
+    }
+
+    .gal-item:hover .gal-cat {
+      transform: none;
+      opacity: 1;
+    }
+
+    .gal-title {
+      font-size: .72rem;
+      letter-spacing: .1em;
+      color: var(--white);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--gold);
+      display: inline-block;
+      padding-bottom: 2px;
+      transform: translateY(10px);
+      transition: transform .4s .1s, opacity .4s .1s;
+      opacity: 0;
+    }
+
+    .gal-item:hover .gal-title {
+      transform: none;
+      opacity: 1;
+    }
+
+    /* Play badge */
+    .play-badge {
+      position: absolute;
+      top: .8rem;
+      right: .8rem;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(201, 168, 76, .18);
+      border: 1px solid rgba(201, 168, 76, .5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 4;
+      opacity: 0;
+      transform: scale(.85);
+      transition: all .4s;
+      backdrop-filter: blur(6px);
+    }
+
+    .play-badge svg {
+      width: 11px;
+      height: 11px;
+      fill: var(--gold-light);
+      margin-left: 2px;
+    }
+
+    .has-video .play-badge {
+      opacity: .7;
+      transform: scale(1);
+    }
+
+    .has-video:hover .play-badge {
+      opacity: 1;
+      transform: scale(1.18);
+      box-shadow: 0 0 18px rgba(201, 168, 76, .45);
+    }
+
+    /* ── WHY CHOOSE US ────────────────────────── */
+    .why-card {
+      padding: 2.2rem;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .06);
+      background: linear-gradient(135deg, rgba(255, 255, 255, .03), rgba(201, 168, 76, .02));
+      transition: border-color .4s, box-shadow .4s, transform .4s cubic-bezier(.23, 1, .32, 1);
+      cursor: none;
+    }
+
+    .why-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity .4s;
+    }
+
+    .why-card:hover {
+      border-color: rgba(201, 168, 76, .2);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .5), 0 0 0 1px rgba(201, 168, 76, .08);
+    }
+
+    .why-card:hover::before {
+      opacity: 1;
+    }
+
+    .why-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 400;
+      color: rgba(201, 168, 76, .1);
+      line-height: 1;
+      margin-bottom: .5rem;
+    }
+
+    .why-icon {
+      margin-bottom: 1.2rem;
+    }
+
+    .why-icon svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .why-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: var(--white);
+      margin-bottom: .7rem;
+    }
+
+    .why-desc {
+      font-size: .77rem;
+      color: var(--muted);
+      line-height: 1.78;
+    }
+
+    /* ── EVENTS LIST ──────────────────────────── */
+    .event-list-card {
+      display: grid;
+      grid-template-columns: 200px 1fr auto;
+      gap: 1.5rem;
+      align-items: center;
+      padding: 1.4rem;
+      border: 1px solid rgba(255, 255, 255, .06);
+      background: rgba(255, 255, 255, .02);
+      transition: border-color .4s, background .4s, transform .35s;
+      cursor: none;
+    }
+
+    .event-list-card:hover {
+      border-color: rgba(201, 168, 76, .2);
+      background: rgba(201, 168, 76, .03);
+      transform: translateX(6px);
+    }
+
+    .event-list-img {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      filter: brightness(.8);
+      transition: filter .4s;
+    }
+
+    .event-list-card:hover .event-list-img {
+      filter: brightness(1);
+    }
+
+    .event-list-cat {
+      font-size: .52rem;
+      letter-spacing: .25em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: .4rem;
+    }
+
+    .event-list-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--white);
+      margin-bottom: .5rem;
+    }
+
+    .event-list-desc {
+      font-size: .75rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .event-list-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--gold-light);
+      white-space: nowrap;
+    }
+
+    .event-list-date {
+      font-size: .6rem;
+      color: var(--muted);
+      letter-spacing: .1em;
+      margin-top: .25rem;
+    }
+
+    /* ── TESTIMONIALS ─────────────────────────── */
+    .testimonial-card {
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, .06);
+      background: rgba(255, 255, 255, .02);
+      transition: border-color .4s, transform .4s cubic-bezier(.23, 1, .32, 1);
+      cursor: none;
+    }
+
+    .testimonial-card:hover {
+      border-color: rgba(201, 168, 76, .18);
+      transform: translateY(-5px);
+    }
+
+    .testimonial-quote {
+      font-size: .6rem;
+      letter-spacing: .3em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+
+    .testimonial-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--white);
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+      font-weight: 300;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+
+    .testimonial-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(201, 168, 76, .15);
+      border: 1px solid rgba(201, 168, 76, .3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--gold-light);
+      font-family: 'Playfair Display', serif;
+      flex-shrink: 0;
+    }
+
+    .testimonial-name {
+      font-size: .8rem;
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    .testimonial-role {
+      font-size: .62rem;
+      color: var(--muted);
+      letter-spacing: .05em;
+    }
+
+    /* ── VIDEO MODAL ──────────────────────────── */
+    #videoModal {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(0, 0, 0, .96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .4s;
+    }
+
+    #videoModal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #videoModal .modal-inner {
+      width: 90%;
+      max-width: 900px;
+      aspect-ratio: 16/9;
+      position: relative;
+    }
+
+    #videoModal .modal-inner iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    #vmClose {
+      position: absolute;
+      top: -46px;
+      right: 0;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.6rem;
+      cursor: none;
+      transition: color .2s;
+    }
+
+    #vmClose:hover {
+      color: var(--white);
+    }
+
+    /* ── CONTACT STRIP ────────────────────────── */
+    .contact-strip {
+      padding: 80px 60px;
+      background: linear-gradient(120deg, rgba(201, 168, 76, .07) 0%, transparent 60%);
+      border-top: 1px solid rgba(255, 255, 255, .06);
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 3rem;
+    }
+
+    /* ── FOOTER ───────────────────────────────── */
+    footer {
+      background: #080808;
+      border-top: 1px solid rgba(255, 255, 255, .05);
+      padding: 60px 60px 30px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-brand-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+
+    .footer-brand-text span {
+      color: var(--gold);
+    }
+
+    .footer-tagline {
+      font-size: .78rem;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+      max-width: 240px;
+    }
+
+    .footer-social {
+      display: flex;
+      gap: .7rem;
+      margin-top: .2rem;
+    }
+
+    .footer-soc-btn {
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: none;
+      transition: border-color .3s, background .3s, transform .3s;
+      text-decoration: none;
+    }
+
+    .footer-soc-btn:hover {
+      border-color: var(--gold);
+      background: rgba(201, 168, 76, .08);
+      transform: translateY(-2px);
+    }
+
+    .footer-soc-btn svg {
+      width: 15px;
+      height: 15px;
+      stroke: rgba(200, 200, 194, 0.65);
+      fill: none;
+      stroke-width: 1.8;
+      transition: stroke .3s;
+    }
+
+    .footer-soc-btn:hover svg {
+      stroke: var(--gold-light);
+    }
+
+    .footer-col-title {
+      font-size: .58rem;
+      letter-spacing: .3em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: .7rem;
+    }
+
+    .footer-links a {
+      font-size: .78rem;
+      color: var(--muted);
+      text-decoration: none;
+      cursor: none;
+      transition: color .3s;
+      display: inline-block;
+    }
+
+    .footer-links a:hover {
+      color: var(--gold-light);
+      transform: translateX(4px);
+    }
+
+    .footer-contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: .6rem;
+      margin-bottom: .8rem;
+      font-size: .78rem;
+      color: var(--muted);
+    }
+
+    .footer-contact-item svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 2;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, .05);
+      padding-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    .footer-bottom p {
+      font-size: .65rem;
+      color: var(--muted2);
+      letter-spacing: .05em;
+    }
+
+    /* ── SECTIONS SPACING ─────────────────────── */
+    .section-pad {
+      padding: 100px 60px;
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255, 255, 255, .05);
+      margin: 0;
+    }
+
+    /* Video slide */
+    .hero-video-slide {
+      background: #0a0a0a;
+    }
+
+    .hero-video-slide video {
+      transition: opacity 0.8s ease;
+    }
+
+    /* Footer social hover brand colors */
+    .footer-soc-btn[aria-label="Instagram"]:hover {
+      border-color: #e1306c !important;
+      background: rgba(225, 48, 108, .08) !important;
+    }
+
+    .footer-soc-btn[aria-label="Instagram"]:hover svg {
+      stroke: #e1306c !important;
+    }
+
+    .footer-soc-btn[aria-label="Facebook"]:hover {
+      border-color: #1877f2 !important;
+      background: rgba(24, 119, 242, .08) !important;
+    }
+
+    .footer-soc-btn[aria-label="Facebook"]:hover svg {
+      stroke: #1877f2 !important;
+    }
+
+    .footer-soc-btn[aria-label="YouTube"]:hover {
+      border-color: #ff0000 !important;
+      background: rgba(255, 0, 0, .08) !important;
+    }
+
+    .footer-soc-btn[aria-label="YouTube"]:hover svg {
+      stroke: #ff0000 !important;
+    }
+
+    /* ─────────────────────────────────────────────
+   MOBILE RESPONSIVE — all breakpoints
+   ───────────────────────────────────────────── */
+
+    /* ── Tablet (≤900px) ── */
+    @media (max-width: 900px) {
+      .section-pad {
+        padding: 70px 30px;
+      }
+
+      /* Footer grid 2-col */
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+
+      footer {
+        padding: 50px 30px 24px;
+      }
+
+      /* Event list: image full-width */
+      .event-list-card {
+        grid-template-columns: 1fr;
+      }
+
+      .event-list-img {
+        height: 180px;
+        width: 100%;
+      }
+
+      .event-list-card>div:last-child {
+        text-align: left !important;
+      }
+
+      /* Why choose us: stack */
+      .why-choose-grid {
+        grid-template-columns: 1fr !important;
+        gap: 3rem !important;
+      }
+    }
+
+    /* ── Mobile (≤768px) ── */
+    @media (max-width: 768px) {
+
+      body {
+        overflow-x: hidden;
+        cursor: auto;
+      }
+
+      * {
+        cursor: auto !important;
+      }
+
+      #curDot,
+      #curRing {
+        display: none;
+      }
+
+      /* NAV */
+      #navbar {
+        padding: 16px 20px;
+      }
+
+      #navbar.scrolled {
+        padding: 12px 20px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .nav-cta {
+        display: inline-block;
+        padding: .45rem .9rem;
+        font-size: .55rem;
+      }
+
+      .nav-logo-text {
+        font-size: 1rem;
+      }
+
+      /* OVERLAY MENU */
+      .overlay-link {
+        font-size: 2.4rem;
+      }
+
+      #mMenuClose {
+        top: 1.2rem;
+        right: 1.2rem;
+      }
+
+      /* HERO */
+      .hero {
+        min-height: 100svh;
+        padding: 0 1.2rem;
+        justify-content: center;
+      }
+
+      .hero-title {
+        font-size: clamp(2.4rem, 9vw, 3.2rem);
+        line-height: 1.12;
+        margin-bottom: 1rem;
+      }
+
+      .hero-sub {
+        font-size: .8rem;
+        line-height: 1.75;
+        margin-bottom: 1.8rem;
+        padding: 0;
+        max-width: 100%;
+      }
+
+      .hero-badge {
+        margin-bottom: 1.2rem;
+        font-size: .52rem;
+      }
+
+      /* Hero buttons: stack, full-width */
+      .hero-btns {
+        flex-direction: column;
+        width: 100%;
+        gap: .75rem;
+      }
+
+      .btn-primary,
+      .btn-outline {
+        width: 100%;
+        text-align: center;
+      }
+
+      /* Hero stats: pull out of absolute, stack vertically */
+      .hero-stats {
+        position: relative;
+        bottom: unset;
+        transform: none;
+        left: unset;
+        right: unset;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
+      .hero-stat {
+        flex: 1 1 calc(33.333% - 2px);
+        min-width: 90px;
+        padding: .9rem .5rem;
+        border-right: 1px solid rgba(201, 168, 76, 0.28) !important;
+      }
+
+      .hero-stat:last-child {
+        border-right: 1px solid rgba(201, 168, 76, 0.28) !important;
+      }
+
+      .hero-stat-num {
+        font-size: 1.3rem;
+      }
+
+      .hero-stat-label {
+        font-size: .48rem;
+        letter-spacing: .14em;
+      }
+
+      /* Hero dots: push down slightly */
+      .hero-dots {
+        bottom: .6rem;
+      }
+
+      .hero-dot {
+        width: 14px;
+      }
+
+      .hero-dot.active {
+        width: 26px;
+      }
+
+      /* EVENT CARDS GRID: single column */
+      .events-grid {
+        grid-template-columns: 1fr !important;
+        gap: 2px;
+      }
+
+      .event-card-img {
+        height: 220px;
+      }
+
+      /* SERVICES GRID: single column */
+      .services-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* GALLERY GRID: single column */
+      .gallery-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .gal-item {
+        height: 240px !important;
+      }
+
+      /* WHY CHOOSE US */
+      .why-choose-grid {
+        grid-template-columns: 1fr !important;
+        gap: 2.5rem !important;
+      }
+
+      .why-cards-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 2px !important;
+      }
+
+      /* EVENT LIST */
+      .event-list-card {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+      }
+
+      .event-list-img {
+        height: 180px;
+        width: 100%;
+      }
+
+      .event-list-card>div:last-child {
+        text-align: left !important;
+      }
+
+      /* Event search */
+      #eventSearch {
+        width: 100% !important;
+      }
+
+      .event-list-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+      }
+
+      /* TESTIMONIALS: single column */
+      .testimonials-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* CONTACT STRIP */
+      .contact-strip {
+        grid-template-columns: 1fr !important;
+        padding: 50px 20px;
+        gap: 2rem;
+      }
+
+      /* FOOTER */
+      .footer-grid {
+        grid-template-columns: 1fr !important;
+        gap: 2rem;
+      }
+
+      footer {
+        padding: 50px 20px 24px;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .4rem;
+      }
+
+      /* SECTION PAD */
+      .section-pad {
+        padding: 60px 20px;
+      }
+    }
+
+    /* ── Small mobile (≤480px) ── */
+    @media (max-width: 480px) {
+      .hero-title {
+        font-size: 2.2rem;
+      }
+
+      .section-heading {
+        font-size: 1.8rem;
+      }
+
+      .hero-stat {
+        flex: 1 1 calc(33.333% - 2px);
+        padding: .7rem .3rem;
+      }
+
+      .hero-stat-num {
+        font-size: 1.1rem;
+      }
+
+      .hero-stat-label {
+        font-size: .42rem;
+      }
+
+      .why-cards-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .contact-strip {
+        padding: 40px 16px;
+      }
+
+      .section-pad {
+        padding: 50px 16px;
+      }
+
+      footer {
+        padding: 40px 16px 20px;
+      }
+
+      #navbar {
+        padding: 14px 16px;
+      }
+
+      .overlay-link {
+        font-size: 2rem;
+      }
+
+      .event-card-img {
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Scroll progress bar -->
+  <div id="scrollProgress"></div>
+
+  <!-- Custom cursor -->
+  <div id="curDot"></div>
+  <div id="curRing"></div>
+
+  <!-- Video Modal -->
+  <div id="videoModal">
+    <div class="modal-inner">
+      <button id="vmClose">✕</button>
+      <iframe id="vmFrame" src="" allowfullscreen allow="autoplay"></iframe>
+    </div>
+  </div>
+
+  <!-- Full-Screen Overlay Menu -->
+  <div id="mobileMenu">
+    <button id="mMenuClose" aria-label="Close menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <line x1="2" y1="2" x2="16" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        <line x1="16" y1="2" x2="2" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+    </button>
+
+    <nav id="overlayNav">
+      <a href="{% url 'home' %}" class="overlay-link active-link">Home</a>
+      <a href="{% url 'about' %}" class="overlay-link">About</a>
+      <a href="{% url 'team' %}" class="overlay-link">Team</a>
+      <a href="{% url 'ourworks' %}" class="overlay-link">Our Works</a>
+      <a href="{% url 'contact' %}" class="overlay-link">Contact</a>
+    </nav>
+
+    <div id="overlayBottomDeco">
+      <div style="width:30px;height:1px;background:var(--gold);opacity:0.4;"></div>
+      <div style="width:6px;height:6px;background:var(--gold);border-radius:50%;opacity:0.7;"></div>
+      <div style="width:30px;height:1px;background:var(--gold);opacity:0.4;"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════ -->
+  <nav id="navbar">
+    <a href="#" class="nav-logo">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div
+          style="width:44px;height:44px;background:linear-gradient(135deg,#c9a84c,#e2c97e);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 12px rgba(201,168,76,0.3);">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 18h18M5 18l2-8 5 5 5-7 2 10" stroke="#1a1000" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+            <path d="M12 3l1.5 3h3l-2.5 2 1 3L12 9.5 9 11l1-3L7.5 6h3L12 3z" fill="#1a1000" stroke="#1a1000"
+              stroke-width="0.5" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <span class="nav-logo-text">Elite <span>Events</span></span>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#" class="active">Home</a></li>
+      <li><a href="#events">Events</a></li>
+      <li><a href="#services">Service</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#footer-contact">Contact</a></li>
+    </ul>
+
+    <div style="display:flex;align-items:center;gap:14px;">
+      <a href="{% url 'booking' %}" class="nav-cta">Book Now</a>
+      <button class="ham-btn" id="hamBtn" aria-label="Open menu"><span class="ham-line"></span><span
+          class="ham-line"></span><span class="ham-line"></span></button>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-bg" id="heroBg">
+      {% if hero_images %}
+      {% for img in hero_images %}
+      <div class="hero-bg-slide {% if forloop.first %}active{% endif %}"
+        style="background-image:url('{{ img.image.url }}')"></div>
+      {% endfor %}
+      {% else %}
+      <div class="hero-bg-slide active"
+        style="background-image:url('https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=1800&q=90&auto=format&fit=crop')">
+      </div>
+      <div class="hero-bg-slide"
+        style="background-image:url('https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=1800&q=90&auto=format&fit=crop')">
+      </div>
+      <div class="hero-bg-slide"
+        style="background-image:url('https://images.unsplash.com/photo-1510076857177-7470076d4098?w=1800&q=90&auto=format&fit=crop')">
+      </div>
+      <div class="hero-bg-slide"
+        style="background-image:url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1800&q=90&auto=format&fit=crop')">
+      </div>
+      {% endif %}
+      <div class="hero-bg-slide hero-video-slide" id="heroVideoSlide">
+        <video id="heroVideo" muted playsinline loop preload="none"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease;"
+          src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+        <div style="position:absolute;inset:0;background:rgba(10,10,10,0.3);"></div>
+      </div>
+    </div>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge" id="heroBadge">
+        <span class="hero-badge-line"></span>
+        {{ hero_content.badge|default:"Luxury Event Specialists" }}
+        <span class="hero-badge-line"></span>
+      </div>
+
+      <h1 class="hero-title" id="heroTitle">
+        {{ hero_content.title_line1|default:"We Craft" }}<br>
+        <em>{{ hero_content.title_line2|default:"Unforgettable" }}</em><br>
+        {{ hero_content.title_line3|default:"Moments" }}
+      </h1>
+
+      <p class="hero-sub" id="heroSub">
+        {{ hero_content.subtitle|default:"From intimate gatherings to grand celebrations — every detail designed to
+        perfection, every memory crafted with elegance." }}
+      </p>
+
+      <div class="hero-btns" id="heroBtns">
+        <a href="#events" class="btn-primary"><span>Explore Events</span></a>
+        <a href="#gallery" class="btn-outline">View Gallery</a>
+      </div>
+    </div>
+
+    <!-- Stats bar -->
+    <div class="hero-stats" id="heroStats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ hero_content.stat1_num|default:"500+" }}</div>
+        <div class="hero-stat-label">{{ hero_content.stat1_label|default:"Events Hosted" }}</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ hero_content.stat2_num|default:"98%" }}</div>
+        <div class="hero-stat-label">{{ hero_content.stat2_label|default:"Happy Clients" }}</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">{{ hero_content.stat3_num|default:"20+" }}</div>
+        <div class="hero-stat-label">{{ hero_content.stat3_label|default:"Years Experience" }}</div>
+      </div>
+    </div>
+    <!-- Slide dots -->
+    <div class="hero-dots" id="heroDots">
+      {% if hero_images %}
+      {% for img in hero_images %}
+      <button class="hero-dot {% if forloop.first %}active{% endif %}"></button>
+      {% endfor %}
+      {% else %}
+      <button class="hero-dot active"></button>
+      <button class="hero-dot"></button>
+      <button class="hero-dot"></button>
+      <button class="hero-dot"></button>
+      {% endif %}
+      <button class="hero-dot"></button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+     EVENT TYPES
+══════════════════════════════════════════ -->
+  <section class="section-pad" id="events">
+    <div style="max-width:1400px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:64px;" class="reveal">
+        <span class="section-label">What We Do</span>
+        <h2 class="section-heading">Celebrate Every <em>Occasion</em></h2>
+        <p
+          style="font-size:.85rem;color:var(--muted);margin-top:1rem;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.8;">
+          Handcrafted experiences for life's most precious milestones</p>
+      </div>
+
+      <div class="events-grid reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;">
+
+        <div class="event-card">
+          <div class="event-card-badge">Most Popular</div>
+          <img class="event-card-img" src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&q=80"
+            alt="Weddings">
+          <div class="event-card-body">
+            <div class="event-card-icon">
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+              </svg>
+            </div>
+            <div class="event-card-title">Weddings</div>
+            <p class="event-card-desc">Timeless ceremonies and breathtaking receptions designed to tell your unique love
+              story.</p>
+            <a href="#" class="event-card-link">Explore <span>→</span></a>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-card-badge"
+            style="background:var(--black3);color:var(--gold-light);border:1px solid var(--gold-dim);">Premium</div>
+          <img class="event-card-img" src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=600&q=80"
+            alt="Corporate Events">
+          <div class="event-card-body">
+            <div class="event-card-icon">
+              <svg viewBox="0 0 24 24">
+                <rect x="2" y="7" width="20" height="14" rx="2" />
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+              </svg>
+            </div>
+            <div class="event-card-title">Corporate Events</div>
+            <p class="event-card-desc">Elevate your brand with impeccable conferences, launches, and galas that leave
+              lasting impressions.</p>
+            <a href="#" class="event-card-link">Explore <span>→</span></a>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-card-badge"
+            style="background:rgba(201,168,76,.15);color:var(--gold-light);border:1px solid var(--gold-dim);">Trending
+          </div>
+          <img class="event-card-img" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&q=80"
+            alt="Social Gatherings">
+          <div class="event-card-body">
+            <div class="event-card-icon">
+              <svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <div class="event-card-title">Social Gatherings</div>
+            <p class="event-card-desc">Birthdays, anniversaries, and private parties transformed into extraordinary
+              experiences.</p>
+            <a href="#" class="event-card-link">Explore <span>→</span></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+     SERVICES
+══════════════════════════════════════════ -->
+  <section class="section-pad" id="services" style="background:var(--black2);">
+    <div style="max-width:1400px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:64px;" class="reveal">
+        <span class="section-label">Our Services</span>
+        <h2 class="section-heading">Everything You <em>Need</em></h2>
+      </div>
+
+      <div class="services-grid reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;">
+        {% if services %}
+        {% for service in services %}
+        <div class="service-card">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          </div>
+          <div class="service-title">{{ service.name }}</div>
+          <p class="service-desc">{{ service.description }}</p>
+          {% if service.price %}
+          <p style="color:var(--gold);font-size:.8rem;margin-top:.5rem;">₹{{ service.price|floatformat:0 }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.07 4.93l-1.41 1.41" />
+              <path d="M4.93 4.93l1.41 1.41" />
+              <path d="M12 2v2" />
+              <path d="M12 20v2" />
+              <path d="M20 12h2" />
+              <path d="M2 12h2" />
+              <path d="M17.66 17.66l-1.41-1.41" />
+              <path d="M6.34 17.66l1.41-1.41" />
+            </svg></div>
+          <div class="service-title">Event Design</div>
+          <p class="service-desc">Bespoke themes, décor, and ambiance tailored to your vision. Every detail curated with
+            artistic precision.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24">
+              <path d="M9 18V5l12-2v13" />
+              <circle cx="6" cy="18" r="3" />
+              <circle cx="18" cy="16" r="3" />
+            </svg></div>
+          <div class="service-title">Entertainment</div>
+          <p class="service-desc">Live bands, DJs, performers — we curate unforgettable entertainment that keeps guests
+            talking.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24">
+              <path d="M3 11l19-9-9 19-2-8-8-2z" />
+            </svg></div>
+          <div class="service-title">Fine Catering</div>
+          <p class="service-desc">Exquisite menus crafted by award-winning culinary experts. Every bite an experience.
+          </p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg></div>
+          <div class="service-title">Photography</div>
+          <p class="service-desc">Capturing your moments with editorial-style luxury photography and cinematography.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24">
+              <path d="M1 3h15v13H1z" />
+              <path d="M16 8l5 3-5 3V8z" />
+            </svg></div>
+          <div class="service-title">AV Production</div>
+          <p class="service-desc">State-of-the-art LED screens, lighting rigs, and sound systems for breathtaking
+            productions.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg></div>
+          <div class="service-title">Floral Design</div>
+          <p class="service-desc">Stunning floral installations that transform every space into a breathtaking visual
+            experience.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+     GALLERY
+══════════════════════════════════════════ -->
+  <section class="section-pad" id="gallery">
+    <div style="max-width:1400px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:64px;" class="reveal">
+        <span class="section-label">Our Portfolio</span>
+        <h2 class="section-heading">Event <em>Gallery</em></h2>
+        <p style="font-size:.85rem;color:var(--muted);margin-top:1rem;line-height:1.8;">Each production is a universe
+          built from light, structure, and imagination</p>
+      </div>
+
+      <div class="gallery-grid reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+
+        <div class="gal-item has-video" style="height:320px;"
+          onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+          <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=700&q=80" alt="CM Trophy"
+            style="height:100%;">
+          <div class="play-badge"><svg viewBox="0 0 24 24">
+              <polygon points="5,3 19,12 5,21" />
+            </svg></div>
+          <div class="gal-overlay"><span class="gal-cat">Sports · 2025</span><span class="gal-title">CM Trophy
+              2025</span></div>
+        </div>
+
+        <div class="gal-item" style="height:320px;">
+          <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=700&q=80" alt="Gala Night"
+            style="height:100%;">
+          <div class="gal-overlay"><span class="gal-cat">Awards · 2024</span><span class="gal-title">Grand Gala
+              Night</span></div>
+        </div>
+
+        <div class="gal-item has-video" style="height:320px;"
+          onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+          <img src="https://images.unsplash.com/photo-1506157786151-b8491531f063?w=700&q=80" alt="Cultural Fest"
+            style="height:100%;">
+          <div class="play-badge"><svg viewBox="0 0 24 24">
+              <polygon points="5,3 19,12 5,21" />
+            </svg></div>
+          <div class="gal-overlay"><span class="gal-cat">Ceremony · 2024</span><span class="gal-title">Cultural
+              Festival</span></div>
+        </div>
+
+        <div class="gal-item has-video" style="height:250px;"
+          onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+          <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=700&q=80" alt="Corporate Summit"
+            style="height:100%;">
+          <div class="play-badge"><svg viewBox="0 0 24 24">
+              <polygon points="5,3 19,12 5,21" />
+            </svg></div>
+          <div class="gal-overlay"><span class="gal-cat">Corporate · 2025</span><span class="gal-title">GCC Next
+              Summit</span></div>
+        </div>
+
+        <div class="gal-item" style="height:250px;">
+          <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=700&q=80" alt="Jaipur Fest"
+            style="height:100%;">
+          <div class="gal-overlay"><span class="gal-cat">Ceremony · 2023</span><span class="gal-title">Jaipur Cultural
+              Fest</span></div>
+        </div>
+
+        <div class="gal-item has-video" style="height:250px;"
+          onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+          <img src="https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=700&q=80" alt="iAW Awards"
+            style="height:100%;">
+          <div class="play-badge"><svg viewBox="0 0 24 24">
+              <polygon points="5,3 19,12 5,21" />
+            </svg></div>
+          <div class="gal-overlay"><span class="gal-cat">Awards · 2024</span><span class="gal-title">iAW Achievers
+              Awards</span></div>
+        </div>
+
+        <div class="gal-item" style="height:280px;">
+          <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=700&q=80" alt="Opening Ceremony"
+            style="height:100%;">
+          <div class="gal-overlay"><span class="gal-cat">Ceremony · 2024</span><span class="gal-title">Opening
+              Ceremony</span></div>
+        </div>
+
+        <div class="gal-item has-video" style="height:280px;"
+          onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+          <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700&q=80" alt="Movie Launch"
+            style="height:100%;">
+          <div class="play-badge"><svg viewBox="0 0 24 24">
+              <polygon points="5,3 19,12 5,21" />
+            </svg></div>
+          <div class="gal-overlay"><span class="gal-cat">Film · 2024</span><span class="gal-title">Lal Salaam
+              Launch</span></div>
+        </div>
+
+        <div class="gal-item" style="height:280px;">
+          <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6?w=700&q=80" alt="Golden Jubilee"
+            style="height:100%;">
+          <div class="gal-overlay"><span class="gal-cat">Ceremony · 2023</span><span class="gal-title">Golden
+              Jubilee</span></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+     WHY CHOOSE US
+══════════════════════════════════════════ -->
+  <section class="section-pad" style="background:var(--black2);">
+    <div style="max-width:1400px;margin:0 auto;">
+      <div class="why-choose-grid reveal"
+        style="display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;">
+        <div>
+          <span class="section-label">Why Elite Events</span>
+          <h2 class="section-heading" style="margin-bottom:1.5rem;">The Standard of <em>Excellence</em></h2>
+          <p style="font-size:.85rem;color:var(--muted);line-height:1.85;margin-bottom:2rem;">Two decades of crafting
+            legendary events across India. We don't just plan events — we architect experiences that live in memory
+            forever.</p>
+          <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}"
+            class="btn-primary" style="display:inline-block;"><span>Start Planning</span></a>
+        </div>
+        <div class="why-cards-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2px;">
+          <div class="why-card">
+            <div class="why-num">01</div>
+            <div class="why-icon"><svg viewBox="0 0 24 24">
+                <path
+                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg></div>
+            <div class="why-title">20+ Years Expertise</div>
+            <p class="why-desc">Two decades mastering every aspect of event production.</p>
+          </div>
+          <div class="why-card">
+            <div class="why-num">02</div>
+            <div class="why-icon"><svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg></div>
+            <div class="why-title">500+ Events</div>
+            <p class="why-desc">Successfully delivered across India's most prestigious venues.</p>
+          </div>
+          <div class="why-card">
+            <div class="why-num">03</div>
+            <div class="why-icon"><svg viewBox="0 0 24 24">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg></div>
+            <div class="why-title">Zero Compromise</div>
+            <p class="why-desc">No cuts, no retakes — perfection delivered live, every single time.</p>
+          </div>
+          <div class="why-card">
+            <div class="why-num">04</div>
+            <div class="why-icon"><svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg></div>
+            <div class="why-title">End-to-End</div>
+            <p class="why-desc">From concept to execution — a single team handling everything.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+     OUR EVENTS LIST
+══════════════════════════════════════════ -->
+  <section class="section-pad" id="event-list">
+    <div style="max-width:1400px;margin:0 auto;">
+      <div class="event-list-header reveal"
+        style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:56px;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <span class="section-label">Our Events</span>
+          <h2 class="section-heading">Upcoming <em>Productions</em></h2>
+        </div>
+        <div style="position:relative;width:100%;max-width:240px;">
+          <input id="eventSearch" type="text" placeholder="Search events..."
+            style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--white);padding:.65rem 1rem .65rem 2.6rem;font-size:.75rem;font-family:'Montserrat',sans-serif;width:100%;outline:none;transition:border-color .3s;"
+            onfocus="this.style.borderColor='var(--gold-dim)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'">
+          <svg
+            style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2;"
+            viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:2px;" id="eventListContainer" class="reveal">
+
+        <div class="event-list-card" data-title="Royal Wedding Extravaganza">
+          <img class="event-list-img" src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80"
+            alt="Wedding">
+          <div>
+            <div class="event-list-cat">Weddings</div>
+            <div class="event-list-title">Royal Wedding Extravaganza</div>
+            <p class="event-list-desc">Turn your dream wedding into reality with bespoke planning and luxurious décor.
+            </p>
+          </div>
+          <div>
+            <div class="event-list-price">₹5,00,000+</div>
+            <div class="event-list-date">May 15, 2026</div>
+            <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}"
+              class="btn-primary"
+              style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book
+                Now</span></a>
+          </div>
+        </div>
+
+        <div class="event-list-card" data-title="Corporate Leadership Summit">
+          <img class="event-list-img" src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=400&q=80"
+            alt="Corporate">
+          <div>
+            <div class="event-list-cat">Corporate</div>
+            <div class="event-list-title">Corporate Leadership Summit</div>
+            <p class="event-list-desc">Elevate your brand with impeccable conferences and galas that leave lasting
+              impressions.</p>
+          </div>
+          <div>
+            <div class="event-list-price">₹2,50,000+</div>
+            <div class="event-list-date">June 8, 2026</div>
+            <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}"
+              class="btn-primary"
+              style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book
+                Now</span></a>
+          </div>
+        </div>
+
+        <div class="event-list-card" data-title="Fun-Filled Birthday Celebration">
+          <img class="event-list-img" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&q=80"
+            alt="Birthday">
+          <div>
+            <div class="event-list-cat">Social</div>
+            <div class="event-list-title">Fun-Filled Birthday Celebration</div>
+            <p class="event-list-desc">Celebrate with exciting themes, vibrant decorations, and engaging activities.</p>
+          </div>
+          <div>
+            <div class="event-list-price">₹75,000+</div>
+            <div class="event-list-date">April 28, 2026</div>
+            <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}"
+              class="btn-primary"
+              style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book
+                Now</span></a>
+          </div>
+        </div>
+
+        <div class="event-list-card" data-title="Elegant Product Launch">
+          <img class="event-list-img" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80"
+            alt="Launch">
+          <div>
+            <div class="event-list-cat">Corporate</div>
+            <div class="event-list-title">Elegant Product Launch</div>
+            <p class="event-list-desc">Cinematic product reveals with breathtaking stage design and AV production.</p>
+          </div>
+          <div>
+            <div class="event-list-price">₹3,00,000+</div>
+            <div class="event-list-date">July 12, 2026</div>
+            <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}"
+              class="btn-primary"
+              style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book
+                Now</span></a>
+          </div>
+        </div>
+
+        <div class="event-list-card" data-title="Grand Housewarming Ceremony">
+          <img class="event-list-img" src="https://images.unsplash.com/photo-1531058020387-3be344556be6?w=400&q=80"
+            alt="Housewarming">
+          <div>
+            <div class="event-list-cat">Social</div>
+            <div class="event-list-title">Grand Housewarming Ceremony</div>
+            <p class="event-list-desc">Make your new home truly special with traditional rituals and modern décor.</p>
+          </div>
+          <div>
+            <div class="event-list-price">₹50,000+</div>
+            <div class="event-list-date">May 3, 2026</div>
+            <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}"
+              class="btn-primary"
+              style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book
+                Now</span></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+     TESTIMONIALS
+══════════════════════════════════════════ -->
+  <section class="section-pad" style="background:var(--black2);">
+    <div style="max-width:1400px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:64px;" class="reveal">
+        <span class="section-label">Client Love</span>
+        <h2 class="section-heading">What They <em>Say</em></h2>
+      </div>
+
+      <div class="testimonials-grid reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;">
+        {% if testimonials %}
+        {% for t in testimonials %}
+        <div class="testimonial-card" {% if forloop.counter == 2 %}style="border-color:rgba(201,168,76,.2);background:rgba(201,168,76,.03);"{% endif %}>
+          <div class="testimonial-quote">★★★★★</div>
+          <p class="testimonial-text">"{{ t.quote }}"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">{{ t.name|first|upper }}</div>
+            <div>
+              <div class="testimonial-name">{{ t.name }}</div>
+              <div class="testimonial-role">{{ t.event_type }}</div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="testimonial-card">
+          <div class="testimonial-quote">★★★★★</div>
+          <p class="testimonial-text">"The attention to detail was extraordinary. Every element was executed to absolute
+            perfection."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">P</div>
+            <div>
+              <div class="testimonial-name">Priya & Arjun</div>
+              <div class="testimonial-role">Wedding — Mumbai</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card" style="border-color:rgba(201,168,76,.2);background:rgba(201,168,76,.03);">
+          <div class="testimonial-quote">★★★★★</div>
+          <p class="testimonial-text">"Elite Events transformed our corporate summit into a cinematic experience."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">R</div>
+            <div>
+              <div class="testimonial-name">Rahul Mehta</div>
+              <div class="testimonial-role">Corporate Launch — Delhi</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-quote">★★★★★</div>
+          <p class="testimonial-text">"Our anniversary gala was beyond spectacular. Guests are still talking about it
+            months later."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">S</div>
+            <div>
+              <div class="testimonial-name">Sneha Kapoor</div>
+              <div class="testimonial-role">Birthday Gala — Chennai</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+     CONTACT STRIP
+══════════════════════════════════════════ -->
+  <div class="contact-strip" id="contact">
+    <div>
+      <span class="section-label">Get In Touch</span>
+      <h2 class="section-heading" style="font-size:clamp(1.8rem,4vw,3rem);margin-bottom:.8rem;">Ready to Create
+        Something <em>Extraordinary?</em></h2>
+      <p style="font-size:.83rem;color:var(--muted);line-height:1.8;max-width:480px;">Tell us your vision. We'll make it
+        legendary.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1rem;align-items:flex-start;">
+      <a href="tel:{{ contact_info.phone|default:'+91 98765 43210' }}" class="btn-primary"
+        style="display:inline-block;"><span>{{ contact_info.phone|default:'+91 98765 43210' }}</span></a>
+      <a href="mailto:{{ contact_info.email|default:'hello@eliteevents.in' }}"
+        style="font-size:.65rem;letter-spacing:.2em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color .3s;"
+        onmouseover="this.style.color='var(--gold-light)'" onmouseout="this.style.color='var(--muted)'">{{
+        contact_info.email|default:'hello@eliteevents.in' }} →</a>
+      style="font-size:.65rem;letter-spacing:.2em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color
+      .3s;"
+      onmouseover="this.style.color='var(--gold-light)'" onmouseout="this.style.color='var(--muted)'">hello@revents.in
+      →</a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+  <footer id="footer-contact">
+    <div class="footer-grid">
+      <div>
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:1rem;">
+          <div
+            style="width:34px;height:34px;background:linear-gradient(135deg,#c9a84c,#e2c97e);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M3 18h18M5 18l2-8 5 5 5-7 2 10" stroke="#1a1000" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+              <path d="M12 3l1.5 3h3l-2.5 2 1 3L12 9.5 9 11l1-3L7.5 6h3L12 3z" fill="#1a1000" stroke="#1a1000"
+                stroke-width="0.5" />
+            </svg>
+          </div>
+          <span class="footer-brand-text">Elite <span>Events</span></span>
+        </div>
+        <p class="footer-tagline">Crafting extraordinary experiences for life's most meaningful moments.</p>
+
+        <div class="footer-social" style="gap:.7rem;">
+          <a href="{{ contact_info.instagram|default:'https://instagram.com' }}" target="_blank" class="footer-soc-btn"
+            aria-label="Instagram" style="text-decoration:none;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <circle cx="12" cy="12" r="4.5" />
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+            </svg>
+          </a>
+          <a href="{{ contact_info.facebook|default:'https://facebook.com' }}" target="_blank" class="footer-soc-btn"
+            aria-label="Facebook" style="text-decoration:none;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+          </a>
+          <a href="https://youtube.com" target="_blank" class="footer-soc-btn" aria-label="YouTube"
+            style="text-decoration:none;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
+              <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Quick Links</div>
+        <ul class="footer-links">
+          <li><a href="#">Home</a></li>
+          <li><a href="#events">Events</a></li>
+          <li><a href="#services">Service</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Services</div>
+        <ul class="footer-links">
+          <li><a href="#">Wedding Planning</a></li>
+          <li><a href="#">Corporate Events</a></li>
+          <li><a href="#">Social Gatherings</a></li>
+          <li><a href="#">Floral Design</a></li>
+          <li><a href="#">Catering</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="footer-col-title">Get In Touch</div>
+        <div class="footer-contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.18 2 2 0 0 1 3.62 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.09a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16c.095.285.145.583.145.879z" />
+          </svg>
+          {{ contact_info.phone|default:'+91 98765 43210' }}
+        </div>
+        <div class="footer-contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+          </svg>
+          {{ contact_info.email|default:'hello@eliteevents.in' }}
+        </div>
+        <div class="footer-contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          {{ contact_info.address|default:'Chennai, Tamil Nadu' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2025 Elite Events India. All rights reserved.</p>
+      <p style="color:var(--gold-dim);font-size:.6rem;letter-spacing:.1em;">eliteevents.in</p>
+    </div>
+  </footer>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ── CURSOR ──────────────────────────────────────────
+    const dot = document.getElementById('curDot');
+    const ring = document.getElementById('curRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+    });
+    (function animRing() {
+      rx += (mx - rx) * .13; ry += (my - ry) * .13;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animRing);
+    })();
+    document.querySelectorAll('a,button,.event-card,.gal-item,.service-card,.why-card,.testimonial-card,.event-list-card,.hero-dot,.footer-soc-btn').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('hov'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('hov'));
+    });
+    document.addEventListener('mousedown', () => ring.classList.add('clk'));
+    document.addEventListener('mouseup', () => ring.classList.remove('clk'));
+
+    // ── SCROLL PROGRESS ─────────────────────────────────
+    const progressBar = document.getElementById('scrollProgress');
+    window.addEventListener('scroll', () => {
+      const pct = (scrollY / (document.body.scrollHeight - innerHeight)) * 100;
+      progressBar.style.height = pct + '%';
+    });
+
+    // ── NAV ─────────────────────────────────────────────
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', scrollY > 50));
+
+    const hamBtn = document.getElementById('hamBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mMenuClose = document.getElementById('mMenuClose');
+
+    function openOverlay() {
+      hamBtn.classList.add('open');
+      mobileMenu.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeOverlay() {
+      hamBtn.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    hamBtn.addEventListener('click', () => mobileMenu.classList.contains('open') ? closeOverlay() : openOverlay());
+    mMenuClose.addEventListener('click', closeOverlay);
+    mobileMenu.querySelectorAll('.overlay-link').forEach(a => a.addEventListener('click', closeOverlay));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+
+    // ── HERO ANIMATIONS (GSAP) ───────────────────────────
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.to('#heroBadge', { opacity: 1, y: 0, duration: 1, delay: .3 })
+      .to('#heroTitle', { opacity: 1, duration: 1.2, ease: 'power2.out' }, '-=.5')
+      .to('#heroSub', { opacity: 1, y: 0, duration: .9 }, '-=.6')
+      .to('#heroBtns', { opacity: 1, y: 0, duration: .8 }, '-=.5')
+      .to('#heroStats', { opacity: 1, y: 0, duration: .8 }, '-=.4');
+
+    // ── HERO REEL (5 slides incl. video) ─────────────────
+    const slides = document.querySelectorAll('.hero-bg-slide');
+    const dots = document.querySelectorAll('.hero-dot');
+    const heroVideoEl = document.getElementById('heroVideo');
+    let hIdx = 0;
+    let slideTimer = null;
+
+    function activateSlide(idx) {
+      slides[hIdx].classList.remove('active');
+      dots[hIdx].classList.remove('active');
+      slides[hIdx].style.animation = 'none';
+      if (slides[hIdx].classList.contains('hero-video-slide') && heroVideoEl) {
+        heroVideoEl.pause();
+        heroVideoEl.style.opacity = '0';
+      }
+
+      hIdx = (idx + slides.length) % slides.length;
+      slides[hIdx].classList.add('active');
+      dots[hIdx].classList.add('active');
+      void slides[hIdx].offsetWidth;
+      slides[hIdx].style.animation = '';
+
+      if (slides[hIdx].classList.contains('hero-video-slide') && heroVideoEl) {
+        heroVideoEl.load();
+        heroVideoEl.play().then(() => {
+          heroVideoEl.style.opacity = '1';
+        }).catch(() => { });
+        clearTimeout(slideTimer);
+        slideTimer = setTimeout(() => activateSlide(hIdx + 1), 8000);
+        return;
+      }
+      clearTimeout(slideTimer);
+      slideTimer = setTimeout(() => activateSlide(hIdx + 1), 5500);
+    }
+
+    slideTimer = setTimeout(() => activateSlide(1), 5500);
+
+    dots.forEach((d, i) => d.addEventListener('click', () => {
+      clearTimeout(slideTimer);
+      activateSlide(i);
+    }));
+
+    // ── GSAP SCROLL REVEALS ──────────────────────────────
+    gsap.utils.toArray('.reveal').forEach((el) => {
+      gsap.to(el, {
+        opacity: 1, y: 0, duration: .9,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+      });
+    });
+    gsap.utils.toArray('.reveal-left').forEach(el => {
+      gsap.to(el, { opacity: 1, x: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+    });
+    gsap.utils.toArray('.reveal-right').forEach(el => {
+      gsap.to(el, { opacity: 1, x: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+    });
+    gsap.utils.toArray('.reveal-scale').forEach(el => {
+      gsap.to(el, { opacity: 1, scale: 1, duration: .9, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+    });
+
+    // Stagger grid children
+    document.querySelectorAll('.events-grid,.services-grid,.gallery-grid,.why-cards-grid,.testimonials-grid').forEach(grid => {
+      const children = Array.from(grid.children);
+      ScrollTrigger.create({
+        trigger: grid, start: 'top 85%', once: true,
+        onEnter: () => {
+          gsap.fromTo(children, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: .7, stagger: .12, ease: 'power3.out' });
+        }
+      });
+    });
+
+    // ── STATS COUNTER ────────────────────────────────────
+    const statEls = document.querySelectorAll('.hero-stat-num');
+    let statsDone = false;
+    ScrollTrigger.create({
+      trigger: '#heroStats', start: 'top 90%', once: true,
+      onEnter: () => {
+        if (statsDone) return; statsDone = true;
+        [500, 98, 20].forEach((target, i) => {
+          const el = statEls[i];
+          const suffix = el.innerHTML.match(/<span[^>]*>.*?<\/span>/)?.[0] || '';
+          let n = 0;
+          const iv = setInterval(() => {
+            n = Math.min(n + target / 50, target);
+            el.innerHTML = Math.round(n) + suffix;
+            if (n >= target) clearInterval(iv);
+          }, 24);
+        });
+      }
+    });
+
+    // ── HERO PARALLAX ────────────────────────────────────
+    window.addEventListener('scroll', () => {
+      const y = scrollY;
+      document.querySelectorAll('.hero-bg-slide').forEach(s => {
+        s.style.transform = `translateY(${y * .25}px)`;
+      });
+    });
+
+    // ── VIDEO MODAL ──────────────────────────────────────
+    const videoModal = document.getElementById('videoModal');
+    const vmFrame = document.getElementById('vmFrame');
+    function openVideo(url) {
+      vmFrame.src = url + '?autoplay=1';
+      videoModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    document.getElementById('vmClose').addEventListener('click', () => {
+      videoModal.classList.remove('active');
+      vmFrame.src = '';
+      document.body.style.overflow = '';
+    });
+    videoModal.addEventListener('click', e => {
+      if (e.target === videoModal) {
+        videoModal.classList.remove('active');
+        vmFrame.src = '';
+        document.body.style.overflow = '';
+      }
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && videoModal.classList.contains('active')) {
+        videoModal.classList.remove('active');
+        vmFrame.src = '';
+        document.body.style.overflow = '';
+      }
+    });
+
+    // ── EVENT SEARCH ─────────────────────────────────────
+    document.getElementById('eventSearch').addEventListener('input', function () {
+      const q = this.value.toLowerCase();
+      document.querySelectorAll('#eventListContainer .event-list-card').forEach(card => {
+        const match = card.dataset.title.toLowerCase().includes(q) ||
+          card.querySelector('.event-list-cat').textContent.toLowerCase().includes(q);
+        card.style.display = match ? 'grid' : 'none';
+      });
+    });
+
+    // ── KEYBOARD NAVIGATION ──────────────────────────────
+    document.addEventListener('keydown', e => {
+      if (videoModal.classList.contains('active')) return;
+      if (e.key === 'ArrowRight') { clearTimeout(slideTimer); activateSlide(hIdx + 1); }
+      if (e.key === 'ArrowLeft') { clearTimeout(slideTimer); activateSlide(hIdx - 1); }
+    });
+  </script>
+</body>
+
+</html>

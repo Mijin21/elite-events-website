@@ -1,0 +1,1601 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Elite — Events</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: #0d0d0d;
+      color: #e8e8e8;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    #curDot {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #f0f0ea;
+      mix-blend-mode: difference;
+      transform: translate(-50%, -50%);
+      transition: transform .1s;
+    }
+
+    #curRing {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid rgba(201, 168, 76, .5);
+      transform: translate(-50%, -50%);
+      transition: width .25s, height .25s, border-color .25s, background .25s;
+    }
+
+    #curRing.hov {
+      width: 52px;
+      height: 52px;
+      border-color: #c9a84c;
+      background: rgba(201, 168, 76, .06);
+    }
+
+    #menuCloseBtn {
+      overflow: visible;
+    }
+
+    #curRing.clk {
+      transform: translate(-50%, -50%) scale(.82);
+    }
+
+    .gold {
+      color: #c9a84c;
+    }
+
+    .gold-light {
+      color: #d4b96a;
+    }
+
+    /* NAV */
+    #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      background: #0d0d0d;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #navbar.scrolled {
+      background: rgba(13, 13, 13, 0.97);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    /* HAMBURGER */
+    .ham-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: none;
+      padding: 6px;
+      flex-shrink: 0;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .ham-line {
+      width: 22px;
+      height: 1.5px;
+      background: #e8e8e8;
+      transition: .38s cubic-bezier(.23, 1, .32, 1);
+      display: block;
+    }
+
+    .ham-btn.open .ham-line:nth-child(1) {
+      transform: translateY(6.5px) rotate(45deg);
+    }
+
+    .ham-btn.open .ham-line:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    .ham-btn.open .ham-line:nth-child(3) {
+      transform: translateY(-6.5px) rotate(-45deg);
+    }
+
+    /* MOBILE MENU */
+    #mobileMenu {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #mobileMenu.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #menuCloseBtn {
+      position: absolute;
+      top: 2rem;
+      right: 2.5rem;
+      width: 48px;
+      height: 48px;
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      cursor: none;
+      color: #e8e8e8;
+      font-size: 0;
+      z-index: 99999;
+      transition: border-color 0.3s, transform 0.4s, color 0.3s;
+    }
+
+    #menuCloseBtn:hover {
+      border-color: #c9a84c;
+      color: #d4b96a;
+      transform: rotate(90deg);
+    }
+
+    .overlay-link {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 5vw, 4.5rem);
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      color: #555;
+      text-transform: uppercase;
+      text-decoration: none;
+      line-height: 1.5;
+      display: block;
+      position: relative;
+      transition: color 0.3s, letter-spacing 0.4s;
+      opacity: 0;
+      transform: translateY(20px);
+      text-align: center;
+    }
+
+    .overlay-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 1px;
+      background: #c9a84c;
+      transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .overlay-link:hover {
+      color: #fff;
+      letter-spacing: 0.22em;
+    }
+
+    .overlay-link:hover::after {
+      width: 100%;
+    }
+
+    .overlay-link.active-link {
+      color: #d4b96a;
+    }
+
+    #mobileMenu.open .overlay-link {
+      opacity: 1;
+      transform: none;
+    }
+
+    #mobileMenu.open .overlay-link:nth-child(1) {
+      transition: color .3s, letter-spacing .4s, opacity .5s .10s, transform .5s .10s;
+    }
+
+    #mobileMenu.open .overlay-link:nth-child(2) {
+      transition: color .3s, letter-spacing .4s, opacity .5s .18s, transform .5s .18s;
+    }
+
+    #mobileMenu.open .overlay-link:nth-child(3) {
+      transition: color .3s, letter-spacing .4s, opacity .5s .26s, transform .5s .26s;
+    }
+
+    #mobileMenu.open .overlay-link:nth-child(4) {
+      transition: color .3s, letter-spacing .4s, opacity .5s .34s, transform .5s .34s;
+    }
+
+    #mobileMenu.open .overlay-link:nth-child(5) {
+      transition: color .3s, letter-spacing .4s, opacity .5s .42s, transform .5s .42s;
+    }
+
+    /* MAIN CONTENT */
+    .page-top-pad {
+      padding-top: 80px;
+    }
+
+    /* ABOUT SECTION HEADING */
+    .about-heading {
+      text-align: center;
+      padding: 60px 40px 40px;
+    }
+
+    .about-heading h1 {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      color: #e8e8e8;
+      line-height: 1.1;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .about-heading h1 span {
+      color: #c9a84c;
+    }
+
+    .about-subline {
+      margin-top: 16px;
+      font-size: 1rem;
+      color: #888;
+      letter-spacing: 0.01em;
+    }
+
+    .about-subline span {
+      color: #c9a84c;
+    }
+
+    /* TWO-COLUMN ABOUT BODY */
+    .about-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      max-width: 100%;
+      padding: 40px 0 60px;
+    }
+
+    @media (max-width: 900px) {
+      .about-body {
+        grid-template-columns: 1fr;
+      }
+
+      .about-right-col {
+        display: none;
+      }
+    }
+
+    .about-left {
+      padding: 0 60px 0 100px;
+    }
+
+    @media (max-width: 1200px) {
+      .about-left {
+        padding: 0 40px 0 60px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .about-left {
+        padding: 0 30px;
+      }
+    }
+
+    .about-welcome {
+      font-size: clamp(2rem, 4.5vw, 3.8rem);
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      line-height: 1.15;
+      color: #e8e8e8;
+      margin-bottom: 48px;
+      letter-spacing: -0.01em;
+    }
+
+    .about-welcome .gold-word {
+      color: #c9a84c;
+    }
+
+    .about-para {
+      font-size: 0.97rem;
+      line-height: 1.85;
+      color: #c8c8c8;
+      text-align: justify;
+      margin-bottom: 28px;
+      font-weight: 300;
+      letter-spacing: 0.01em;
+    }
+
+    /* STICKY IMAGE */
+    .about-right-col {
+      padding: 0 80px 0 40px;
+      position: relative;
+    }
+
+    .sticky-img-wrap {
+      position: sticky;
+      top: 100px;
+    }
+
+    .sticky-img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      max-height: 460px;
+      object-fit: cover;
+    }
+
+    /* SECTION DIVIDER */
+    .section-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.06);
+      margin: 0;
+    }
+
+    /* CORPORART SECTION */
+    .corporart-section {
+      padding: 80px 40px;
+      text-align: center;
+    }
+
+    .corporart-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-weight: 500;
+      color: #e8e8e8;
+      margin-bottom: 36px;
+    }
+
+    .corporart-title span {
+      color: #c9a84c;
+    }
+
+    .corporart-logo-box {
+      display: inline-flex;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 28px 40px;
+      margin: 0 auto 52px;
+      background: #fff;
+      min-width: 260px;
+      min-height: 120px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .corporart-logo-box img {
+      max-height: 80px;
+      max-width: 220px;
+      object-fit: contain;
+    }
+
+    .corporart-desc {
+      max-width: 1200px;
+      margin: 0 auto;
+      font-size: 1rem;
+      line-height: 1.85;
+      color: #c8c8c8;
+      text-align: left;
+      font-weight: 300;
+    }
+
+    /* PARTNERS */
+    .section-title-center {
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 500;
+      color: #e8e8e8;
+      margin-bottom: 48px;
+    }
+
+    .section-title-center span {
+      color: #c9a84c;
+    }
+
+    .partners-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 680px) {
+      .partners-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+
+    .partner-cell {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      min-height: 120px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .partner-cell:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 24px rgba(201, 168, 76, 0.12);
+      z-index: 2;
+      position: relative;
+    }
+
+    .partner-cell img {
+      max-height: 70px;
+      max-width: 180px;
+      object-fit: contain;
+      filter: none;
+    }
+
+    /* CLIENTS GRID */
+    .clients-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+      padding: 0 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .clients-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        padding: 0 20px;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .clients-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 0 16px;
+      }
+    }
+
+    .client-cell {
+      background: #fff;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 14px 14px;
+      min-height: 110px;
+      gap: 8px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .client-cell:hover {
+      transform: scale(1.04);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      z-index: 3;
+      position: relative;
+    }
+
+    .client-cell img {
+      max-height: 52px;
+      max-width: 120px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .client-name {
+      font-size: 0.62rem;
+      color: #555;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-align: center;
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
+    /* SCROLL REVEAL */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s cubic-bezier(.23, 1, .32, 1), transform 0.7s cubic-bezier(.23, 1, .32, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* VIDEO MODAL */
+    #videoModal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+
+    #videoModal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #videoModal .modal-inner {
+      width: 90%;
+      max-width: 900px;
+      aspect-ratio: 16/9;
+      position: relative;
+    }
+
+    #videoModal iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    #videoModal .close-btn {
+      position: absolute;
+      top: -42px;
+      right: 0;
+      color: #e8e8e8;
+      font-size: 1.8rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      transition: color 0.2s;
+    }
+
+    #videoModal .close-btn:hover {
+      color: #c9a84c;
+    }
+
+    /* Play overlay */
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0);
+      transition: background 0.3s ease;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .img-container:hover .play-overlay {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .play-btn-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(201, 168, 76, 0.2);
+      border: 2px solid #c9a84c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s ease, background 0.25s ease;
+    }
+
+    .img-container:hover .play-btn-circle {
+      transform: scale(1.12);
+      background: rgba(201, 168, 76, 0.4);
+    }
+
+    /* FOOTER */
+    footer {
+      background: #0a0a0a;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 40px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    footer p {
+      font-size: 0.78rem;
+      color: #555;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── MOBILE RESPONSIVE ── */
+    @media (max-width: 768px) {
+      body {
+        cursor: auto;
+      }
+
+      * {
+        cursor: auto !important;
+      }
+
+      #curDot,
+      #curRing {
+        display: none;
+      }
+
+      /* NAV */
+      #navbar {
+        padding: 14px 18px;
+      }
+
+      /* OVERLAY MENU */
+      .overlay-link {
+        font-size: 2.2rem;
+      }
+
+      #menuCloseBtn {
+        top: 1.2rem;
+        right: 1.2rem;
+      }
+
+      /* ABOUT HEADING */
+      .about-heading {
+        padding: 40px 20px 28px;
+      }
+
+      /* ABOUT BODY */
+      .about-body {
+        padding: 20px 0 40px;
+      }
+
+      .about-left {
+        padding: 0 20px;
+      }
+
+      .about-welcome {
+        font-size: clamp(1.8rem, 7vw, 2.6rem);
+        margin-bottom: 28px;
+      }
+
+      .about-para {
+        font-size: 0.9rem;
+        line-height: 1.8;
+      }
+
+      /* CORPORART */
+      .corporart-section {
+        padding: 50px 20px;
+      }
+
+      .corporart-logo-box {
+        padding: 20px 24px;
+        min-width: unset;
+        width: 100%;
+        max-width: 320px;
+      }
+
+      .corporart-desc {
+        font-size: 0.88rem;
+        line-height: 1.8;
+        text-align: left;
+      }
+
+      /* PARTNERS */
+      .partners-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px;
+        padding: 0 20px;
+      }
+
+      .partner-cell {
+        padding: 24px 20px;
+        min-height: 100px;
+      }
+
+      /* CLIENTS */
+      .clients-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+        padding: 0 14px;
+      }
+
+      .client-cell {
+        padding: 14px 10px 10px;
+        min-height: 90px;
+      }
+
+      .client-cell img {
+        max-height: 40px;
+        max-width: 90px;
+      }
+
+      .client-name {
+        font-size: 0.55rem;
+      }
+
+      /* SECTIONS */
+      section[style*="padding: 80px 40px"],
+      section[style*="padding: 80px 0"] {
+        padding: 50px 0 !important;
+      }
+
+      .section-title-center {
+        margin-bottom: 28px;
+        padding: 0 20px 28px !important;
+      }
+
+      /* FOOTER */
+      footer {
+        padding: 30px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .6rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .about-heading {
+        padding: 30px 16px 20px;
+      }
+
+      .about-left {
+        padding: 0 16px;
+      }
+
+      .corporart-section {
+        padding: 40px 16px;
+      }
+
+      .clients-grid {
+        gap: 8px;
+        padding: 0 12px;
+      }
+
+      .client-cell {
+        min-height: 80px;
+        padding: 12px 8px 8px;
+      }
+
+      footer {
+        padding: 24px 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="curDot"></div>
+  <div id="curRing"></div>
+  <!-- ═══════════════════════════════════════════════
+     NAVBAR
+═══════════════════════════════════════════════ -->
+  <nav id="navbar">
+    <div></div>
+    <button class="ham-btn" id="hamBtn"
+      style="display:flex;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;">
+      <span class="ham-line"></span>
+      <span class="ham-line"></span>
+      <span class="ham-line"></span>
+    </button>
+  </nav>
+
+  <div id="mobileMenu">
+    <button id="menuCloseBtn" aria-label="Close menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <line x1="2" y1="2" x2="16" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        <line x1="16" y1="2" x2="2" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+      </svg>
+    </button>
+    <nav style="text-align:center;">
+      <a href="{% url 'home' %}" class="overlay-link">Home</a>
+      <a href="{% url 'about' %}" class="overlay-link active-link">About</a>
+      <a href="{% url 'team' %}" class="overlay-link">Team</a>
+      <a href="{% url 'ourworks' %}" class="overlay-link">Our Works</a>
+      <a href="{% url 'contact' %}" class="overlay-link">Contact</a>
+    </nav>
+    <div
+      style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;gap:6px;align-items:center;">
+      <div style="width:30px;height:1px;background:#c9a84c;opacity:0.4;"></div>
+      <div style="width:6px;height:6px;background:#c9a84c;border-radius:50%;opacity:0.7;"></div>
+      <div style="width:30px;height:1px;background:#c9a84c;opacity:0.4;"></div>
+    </div>
+  </div>
+
+  <!-- Video Modal -->
+  <div id="videoModal">
+    <div class="modal-inner">
+      <button class="close-btn" id="videoCloseBtn">✕</button>
+      <iframe id="videoFrame" src="" allowfullscreen allow="autoplay"></iframe>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════ -->
+  <main class="page-top-pad">
+
+    <!-- ── ABOUT HEADING ── -->
+    <div class="about-heading reveal">
+      <h1>{{ about_content.heading|default:"About " }}<span>{{ about_content.subheading|default:"Elite" }}</span></h1>
+      <p class="about-subline">Get to Know <span>Us.</span></p>
+    </div>
+    <!-- ── ABOUT BODY (text left, image right) ── -->
+    <div class="about-body">
+
+      <!-- Left: text -->
+      <div class="about-left">
+        <div class="about-welcome reveal">
+          {% if about_content.welcome_text %}
+          {{ about_content.welcome_text }}
+          {% else %}
+          Welcome &nbsp;<span class="gold-word">to</span>&nbsp; <span class="gold-word">Renaissance</span><br>
+          <span class="gold-word">events,</span>
+          {% endif %}
+        </div>
+
+        {% if about_content.body %}
+        <p class="about-para reveal">{{ about_content.body }}</p>
+        {% else %}
+        <p class="about-para reveal">
+          One of India's most sought-after Event Management and stage production company based in Chennai. With two
+          decades of experience from events to entertainment to engagement and Media, across industries and businesses,
+          We have but one goal- To push the boundaries of what's possible, to keep the experience at the forefront and
+          spark human connection and most importantly bring in celebrated artists and never-before thought of engagement
+          concepts.
+        </p>
+        <p class="about-para reveal">
+          Our in-house team gathers the requirements from the client after which our creative team of experts and
+          designers conceptualise the theme and visual magnificence for the same. Our artistic and technical expertise
+          join together to bring events to life and provide our clients with an unparalleled customised experience. With
+          every event we orchestrate, we empower a whole community that includes our team members and vendors comprising
+          of the stage fabrication team, carpenters, moulders, welders, artists, painters, drivers, house keeping staff,
+          furniture suppliers, LED and AV equipment suppliers, genest, sound and light teams, florists, manpower
+          liaising teams, caterers and logistic partners just to name a few. This feeling of empowering the entire
+          eco-system with every work that gets converted is our most rewarding contribution to the industry.
+        </p>
+        <p class="about-para reveal">
+          Whether you're hosting a holiday dinner for ten guests or a conference for thousands, we ensure that every
+          aspect from the most obvious to the finest details meets your level of satisfaction. We have no cuts, no
+          retakes , no post production luxuries for our on stage events like any film production but we guarantee the
+          same 3 hour entertainment or more to carry back experiences for a lifetime
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Right: sticky event image -->
+      <div class="about-right-col">
+        <div class="sticky-img-wrap img-container" style="position:sticky;top:100px;">
+          {% if about_image %}
+          <img src="{{ about_image.image.url }}" alt="Elite Events"
+            style="width:100%;max-height:460px;object-fit:cover;display:block;" />
+          {% else %}
+          <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=900&q=85" alt="Renaissance Event"
+            style="width:100%;max-height:460px;object-fit:cover;display:block;" />
+          {% endif %}
+          <div class="play-overlay" onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+            <div class="play-btn-circle">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#c9a84c">
+                <polygon points="5,3 19,12 5,21" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ── CORPORART 24' ── -->
+    <section class="corporart-section">
+      <h2 class="corporart-title reveal">{{ about_content.corporart_title|default:"CorporART 24'" }}</h2>
+
+      <div style="display:flex;justify-content:center;margin-bottom:52px;" class="reveal">
+        <div class="corporart-logo-box">
+          {% if about_content.corporart_logo %}
+          <img src="{{ about_content.corporart_logo }}" alt="CorporART"
+            style="max-height:80px;max-width:220px;object-fit:contain;">
+          {% else %}
+          <div style="text-align:center;">
+            <div
+              style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:#c9a84c;letter-spacing:0.05em;">
+              ★ CorporART 24'
+            </div>
+            <div style="font-size:0.7rem;color:#888;letter-spacing:0.2em;text-transform:uppercase;margin-top:4px;">
+              Corporate Celebrities</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <p class="corporart-desc reveal">
+        {% if about_content.corporart_desc %}
+        {{ about_content.corporart_desc }}
+        {% else %}
+        Calling all corporate stars! Get ready to keep the spreadsheets and presentations aside for a night of glitz and
+        glam at "Corporate Celebrities," an event designed to celebrate the hidden talents lurking within the workforce.
+        Inspired by the vibrant energy of college cultural events and the electrifying rehearsal sessions, which are
+        totally lacking in the corporate industry, this competition offers a platform for employees to shed their
+        professional personas and embrace their artistic sides. Whether you're a vocal powerhouse, a dance floor dynamo,
+        a shutterbug with an eye for capturing moments, a budding filmmaker with a story to tell, or have a secret flair
+        for the runway, Corporate Celebrities has a category where you can shine. It's more than just a competition;
+        it's a chance to boost morale, build camaraderie through teamwork during preparation, showcase hidden talents
+        you might not have known existed within your colleagues, and create a positive and fun work environment that
+        fosters a sense of community and attracts top talent. So dust off your dancing shoes, unleash your inner artist,
+        and get ready to take center stage at Corporate Celebrities!
+        {% endif %}
+      </p>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── OUR PARTNERS ── -->
+    <section style="padding: 80px 40px;" class="reveal">
+      <h2 class="section-title-center"><span>Our</span> Partners</h2>
+
+      <div class="partners-grid">
+        {% if partners %}
+        {% for partner in partners %}
+        <div class="partner-cell">
+          {% if partner.logo %}
+          <img src="{{ partner.logo.url }}" alt="{{ partner.name }}">
+          {% else %}
+          <div style="text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:#c9a84c;">{{
+              partner.name }}</div>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="partner-cell">
+          <div style="text-align:center;">
+            <div
+              style="font-family:Georgia,serif;font-size:1.6rem;color:#c9a84c;font-weight:700;letter-spacing:-0.02em;">
+              golden</div>
+            <div style="font-size:1.8rem;font-weight:900;color:#333;letter-spacing:-0.02em;line-height:1;">HAMMER</div>
+            <div style="font-size:0.55rem;color:#888;letter-spacing:0.15em;margin-top:2px;">stage &amp; backdrop
+              productions</div>
+          </div>
+        </div>
+        <div class="partner-cell">
+          <div style="text-align:center;">
+            <div style="font-size:0.6rem;color:#888;letter-spacing:0.1em;">(((</div>
+            <div style="font-family:Georgia,serif;font-size:1.5rem;font-weight:900;color:#333;letter-spacing:0.02em;">
+              The PODIUM)))</div>
+            <div style="font-size:0.5rem;color:#888;letter-spacing:0.15em;margin-top:2px;">SOUND &amp; LIGHT PRODUCTIONS
+            </div>
+          </div>
+        </div>
+        <div class="partner-cell">
+          <div style="text-align:center;">
+            <div
+              style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:#555;letter-spacing:0.01em;font-style:italic;">
+              Umesh Kumar</div>
+            <div style="font-size:0.55rem;color:#888;letter-spacing:0.12em;margin-top:2px;">Art Director</div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── OUR CLIENTS ── -->
+    <section style="padding: 80px 0;" class="reveal">
+      <h2 class="section-title-center" style="padding:0 40px 48px;"><span>Our</span> Clients</h2>
+
+      <div class="clients-grid" id="clientsGrid">
+        {% if clients %}
+        {% for client in clients %}
+        <div class="client-cell">
+          {% if client.logo %}
+          <img src="{{ client.logo.url }}" alt="{{ client.name }}">
+          {% else %}
+          <div
+            style="text-align:center;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#c9a84c;">
+            {{ client.name }}
+          </div>
+          {% endif %}
+          <span class="client-name">{{ client.name }}</span>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Government_of_Tamil_Nadu_logo.png"
+            alt="Govt of Tamil Nadu">
+          <span class="client-name">Govt of Tamil Nadu</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="36" viewBox="0 0 110 36" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="36" rx="4" fill="#111" /><text x="55" y="25" font-family="Arial Black,sans-serif"
+              font-size="13" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="2">PROVOKE</text>
+          </svg>
+          <span class="client-name">Provoke</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="50" viewBox="0 0 110 50" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="50" rx="3" fill="#f5f0e8" stroke="#c9a84c" stroke-width="1.5" /><text x="55"
+              y="16" font-family="Georgia,serif" font-size="7.5" font-weight="700" fill="#8B0000"
+              text-anchor="middle">TAMIL NADU</text><text x="55" y="28" font-family="Georgia,serif" font-size="6.5"
+              font-weight="600" fill="#333" text-anchor="middle">GLOBAL INVESTORS</text><text x="55" y="40"
+              font-family="Georgia,serif" font-size="8" font-weight="700" fill="#8B0000"
+              text-anchor="middle">MEET</text>
+          </svg>
+          <span class="client-name">TN Global Investors Meet</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="46" viewBox="0 0 110 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="46" rx="4" fill="#fff" />
+            <rect width="110" height="7" fill="#FF9933" />
+            <rect y="39" width="110" height="7" fill="#138808" /><text x="55" y="27"
+              font-family="Arial Black,sans-serif" font-size="10" font-weight="900" fill="#000080" text-anchor="middle"
+              letter-spacing="1">KHELO INDIA</text>
+          </svg>
+          <span class="client-name">Khelo India</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Freshworks-vector-logo.svg" alt="Freshworks">
+          <span class="client-name">Freshworks</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/CavinKare.svg" alt="CavinKare">
+          <span class="client-name">CavinKare</span>
+        </div>
+        <div class="client-cell">
+          <svg width="100" height="40" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="40" rx="20" fill="#4aade8" /><text x="50" y="27" font-family="Georgia,serif"
+              font-size="18" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="1">adams</text>
+          </svg>
+          <span class="client-name">Adams</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/AstraZeneca.svg" alt="AstraZeneca">
+          <span class="client-name">AstraZeneca</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Shell_logo.svg" alt="Shell">
+          <span class="client-name">Shell</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Wipro_Primary_Logo_Color_RGB.svg" alt="Wipro">
+          <span class="client-name">Wipro</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/LG_logo_(2015).svg" alt="LG">
+          <span class="client-name">LG</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="40" viewBox="0 0 110 40" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="40" rx="4" fill="#fff" stroke="#e8560a" stroke-width="2" /><text x="55" y="26"
+              font-family="Arial Black,sans-serif" font-size="14" font-weight="900" fill="#e8560a" text-anchor="middle"
+              letter-spacing="1">POORVIKA</text>
+          </svg>
+          <span class="client-name">Poorvika</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Infosys_logo.svg" alt="Infosys">
+          <span class="client-name">Infosys</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="40" viewBox="0 0 110 40" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="40" rx="4" fill="#fff" />
+            <polygon points="8,20 14,10 26,10 32,20 26,30 14,30" fill="#0066cc" /><text x="66" y="26"
+              font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#0066cc"
+              text-anchor="middle">HEXAWARE</text>
+          </svg>
+          <span class="client-name">Hexaware</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Société_Générale.svg" alt="Societe Generale">
+          <span class="client-name">Societe Generale</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="46" viewBox="0 0 110 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="46" rx="4" fill="#f9f9f9" stroke="#ccc" stroke-width="1" /><text x="55" y="20"
+              font-family="Georgia,serif" font-size="10" font-weight="400" font-style="italic" fill="#555"
+              text-anchor="middle">infinitheism</text>
+            <line x1="20" y1="28" x2="90" y2="28" stroke="#c9a84c" stroke-width="0.8" /><text x="55" y="40"
+              font-family="Arial,sans-serif" font-size="6.5" fill="#888" text-anchor="middle"
+              letter-spacing="1">PERSONAL GROWTH</text>
+          </svg>
+          <span class="client-name">Infinitheism</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="46" viewBox="0 0 110 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="46" rx="4" fill="#0d1b2a" /><text x="55" y="30"
+              font-family="Arial Black,sans-serif" font-size="16" font-weight="900" fill="#fff" text-anchor="middle"
+              letter-spacing="3">CHOSEN</text>
+          </svg>
+          <span class="client-name">Chosen</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/FIS_(company).svg" alt="FIS Global">
+          <span class="client-name">FIS Global</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="46" viewBox="0 0 110 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="46" rx="4" fill="#fff" />
+            <rect x="0" y="0" width="110" height="10" rx="4" fill="#ff4136" /><text x="55" y="34"
+              font-family="Arial Black,sans-serif" font-size="14" font-weight="900" fill="#222" text-anchor="middle"
+              letter-spacing="1">Bobcat</text>
+          </svg>
+          <span class="client-name">Bobcat</span>
+        </div>
+        <div class="client-cell">
+          <svg width="100" height="46" viewBox="0 0 100 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="46" rx="4" fill="#0d2657" /><text x="50" y="22"
+              font-family="Arial Black,sans-serif" font-size="14" font-weight="900" fill="#fff"
+              text-anchor="middle">ICRS</text><text x="50" y="38" font-family="Arial,sans-serif" font-size="11"
+              font-weight="700" fill="#c9a84c" text-anchor="middle">2024</text>
+          </svg>
+          <span class="client-name">ICRS 2024</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Olam_Group_logo.svg" alt="Olam Group">
+          <span class="client-name">Olam Group</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Standard_Chartered.svg"
+            alt="Standard Chartered">
+          <span class="client-name">Standard Chartered</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/HP_logo_2012.svg" alt="HP">
+          <span class="client-name">HP</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Lenovo_logo_2015.svg" alt="Lenovo">
+          <span class="client-name">Lenovo</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Samsung_Logo.svg" alt="Samsung">
+          <span class="client-name">Samsung</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/The_Hindu_logo.svg" alt="The Hindu Group">
+          <span class="client-name">The Hindu Group</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="50" viewBox="0 0 110 50" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="50" rx="4" fill="#1a1a2e" /><text x="55" y="22" font-family="Georgia,serif"
+              font-size="11" font-weight="700" fill="#c9a84c" text-anchor="middle">FORTUNES</text><text x="55" y="37"
+              font-family="Arial,sans-serif" font-size="7.5" font-weight="400" fill="#aaa" text-anchor="middle"
+              letter-spacing="0.5">COMMUNICATION</text>
+          </svg>
+          <span class="client-name">Fortunes Communication</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="50" viewBox="0 0 110 50" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="50" rx="4" fill="#1a0a00" />
+            <rect x="4" y="4" width="102" height="42" rx="3" fill="none" stroke="#e63" stroke-width="1.5" /><text x="55"
+              y="25" font-family="Arial Black,sans-serif" font-size="11" font-weight="900" fill="#ff4444"
+              text-anchor="middle" letter-spacing="1">DWARKA</text><text x="55" y="39" font-family="Arial,sans-serif"
+              font-size="8" font-weight="600" fill="#ccc" text-anchor="middle" letter-spacing="2">STUDIOS</text>
+          </svg>
+          <span class="client-name">Dwarka Studios</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="50" viewBox="0 0 110 50" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="50" rx="4" fill="#003366" />
+            <circle cx="55" cy="18" r="9" fill="none" stroke="#c9a84c" stroke-width="1.5" /><text x="55" y="22"
+              font-family="Georgia,serif" font-size="9" font-weight="700" fill="#c9a84c"
+              text-anchor="middle">V</text><text x="55" y="36" font-family="Georgia,serif" font-size="9"
+              font-weight="700" fill="#fff" text-anchor="middle">VELS UNIVERSITY</text>
+          </svg>
+          <span class="client-name">Vels University</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Adani_Group_Logo.svg" alt="Adani">
+          <span class="client-name">Adani</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Amazon_logo.svg" alt="Amazon">
+          <span class="client-name">Amazon</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="52" viewBox="0 0 110 52" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="52" rx="4" fill="#fff" />
+            <circle cx="55" cy="22" r="13" fill="none" stroke="#138808" stroke-width="2" />
+            <polygon points="55,12 58,19 66,19 60,24 62,32 55,27 48,32 50,24 44,19 52,19" fill="#FF9933" /><text x="55"
+              y="42" font-family="Arial,sans-serif" font-size="6" font-weight="700" fill="#000080"
+              text-anchor="middle">SPORTS DEVELOPMENT</text><text x="55" y="50" font-family="Arial,sans-serif"
+              font-size="6" font-weight="700" fill="#000080" text-anchor="middle">AUTHORITY</text>
+          </svg>
+          <span class="client-name">Sports Dev Authority</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="52" viewBox="0 0 110 52" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="52" rx="4" fill="#1a1a1a" />
+            <rect x="22" y="8" width="8" height="8" fill="#fff" />
+            <rect x="30" y="8" width="8" height="8" fill="#333" />
+            <rect x="38" y="8" width="8" height="8" fill="#fff" />
+            <rect x="46" y="8" width="8" height="8" fill="#333" />
+            <rect x="54" y="8" width="8" height="8" fill="#fff" />
+            <rect x="62" y="8" width="8" height="8" fill="#333" />
+            <rect x="70" y="8" width="8" height="8" fill="#fff" /><text x="55" y="31"
+              font-family="Arial Black,sans-serif" font-size="7.5" font-weight="900" fill="#c9a84c"
+              text-anchor="middle">FIDE CHESS OLYMPIAD</text><text x="55" y="42" font-family="Arial,sans-serif"
+              font-size="7" fill="#aaa" text-anchor="middle">CHENNAI 2022</text>
+          </svg>
+          <span class="client-name">FIDE Chess Olympiad 2022</span>
+        </div>
+        <div class="client-cell">
+          <svg width="100" height="46" viewBox="0 0 100 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="46" rx="4" fill="#fff" stroke="#333" stroke-width="1.5" /><text x="50" y="31"
+              font-family="Georgia,serif" font-size="22" font-weight="700" fill="#1a1a1a" text-anchor="middle"
+              letter-spacing="2">TCCL</text>
+          </svg>
+          <span class="client-name">TCCL</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Dow_Chemical_Company_logo.svg" alt="Dow">
+          <span class="client-name">Dow</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="50" viewBox="0 0 110 50" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="50" rx="4" fill="#f0f7f0" />
+            <circle cx="55" cy="22" r="12" fill="none" stroke="#2e7d32" stroke-width="2" />
+            <ellipse cx="55" cy="22" rx="5" ry="12" fill="none" stroke="#2e7d32" stroke-width="1.2" />
+            <line x1="43" y1="22" x2="67" y2="22" stroke="#2e7d32" stroke-width="1.2" /><text x="55" y="42"
+              font-family="Arial,sans-serif" font-size="6.5" font-weight="700" fill="#2e7d32" text-anchor="middle"
+              letter-spacing="0.5">GLOBAL VILLAGERS</text>
+          </svg>
+          <span class="client-name">Global Villagers</span>
+        </div>
+        <div class="client-cell">
+          <svg width="100" height="46" viewBox="0 0 100 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="46" rx="4" fill="#fff" stroke="#c9320a" stroke-width="2" /><text x="50" y="30"
+              font-family="Arial Black,sans-serif" font-size="20" font-weight="900" fill="#c9320a" text-anchor="middle"
+              letter-spacing="2">NHRD</text>
+          </svg>
+          <span class="client-name">NHRD</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Unilever.svg" alt="Unilever">
+          <span class="client-name">Unilever</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Toshiba_logo.svg" alt="Toshiba">
+          <span class="client-name">Toshiba</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="50" viewBox="0 0 110 50" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="50" rx="4" fill="#fffde7" />
+            <rect x="4" y="4" width="102" height="42" rx="3" fill="none" stroke="#f57f17" stroke-width="1.5" /><text
+              x="55" y="20" font-family="Georgia,serif" font-size="11" font-weight="700" fill="#bf360c"
+              text-anchor="middle">ABS</text><text x="55" y="33" font-family="Arial,sans-serif" font-size="7"
+              fill="#555" text-anchor="middle">VIDHYA MANDHIR</text>
+          </svg>
+          <span class="client-name">ABS Vidhya Mandhir</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="50" viewBox="0 0 110 50" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="50" rx="4" fill="#fff" />
+            <rect width="110" height="8" fill="#1a5fa8" />
+            <rect y="42" width="110" height="8" fill="#1a5fa8" /><text x="55" y="28" font-family="Georgia,serif"
+              font-size="9.5" font-weight="700" fill="#1a5fa8" text-anchor="middle">MURUGAPPA GROUP</text>
+          </svg>
+          <span class="client-name">Murugappa Group</span>
+        </div>
+        <div class="client-cell">
+          <svg width="100" height="46" viewBox="0 0 100 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="46" rx="4" fill="#002366" /><text x="50" y="22"
+              font-family="Arial Black,sans-serif" font-size="14" font-weight="900" fill="#fff" text-anchor="middle"
+              letter-spacing="1">SPR</text><text x="50" y="37" font-family="Arial,sans-serif" font-size="9"
+              fill="#c9a84c" text-anchor="middle" letter-spacing="2">INDIA</text>
+          </svg>
+          <span class="client-name">SPR India</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="50" viewBox="0 0 110 50" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="50" rx="4" fill="#f5f5f5" stroke="#333" stroke-width="1" /><text x="55" y="22"
+              font-family="Arial Black,sans-serif" font-size="10" font-weight="900" fill="#222" text-anchor="middle">VT
+              VISION TIME</text><text x="55" y="36" font-family="Arial,sans-serif" font-size="7" fill="#555"
+              text-anchor="middle">INDIA PVT. LTD.</text>
+          </svg>
+          <span class="client-name">VT Vision Time</span>
+        </div>
+        <div class="client-cell">
+          <svg width="100" height="40" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="40" rx="20" fill="#c0392b" /><text x="50" y="27" font-family="Arial,sans-serif"
+              font-size="16" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="1">Ajuba</text>
+          </svg>
+          <span class="client-name">Ajuba</span>
+        </div>
+        <div class="client-cell">
+          <svg width="60" height="46" viewBox="0 0 60 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="60" height="46" rx="4" fill="#e8f5e9" /><text x="30" y="32" font-family="Arial,sans-serif"
+              font-size="26" text-anchor="middle">🌿</text>
+          </svg>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Sun_TV_Network_logo.svg" alt="Sun TV">
+          <span class="client-name">Sun TV</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Vijay_TV_Logo.svg" alt="Vijay TV">
+          <span class="client-name">விஜய்</span>
+        </div>
+        <div class="client-cell">
+          <svg width="100" height="46" viewBox="0 0 100 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="46" rx="4" fill="#ff6633" /><text x="50" y="22"
+              font-family="Arial Black,sans-serif" font-size="11" font-weight="900" fill="#fff" text-anchor="middle"
+              letter-spacing="1">GOKULAM</text>
+            <rect x="30" y="26" width="40" height="3" rx="1" fill="#ffcc00" /><text x="50" y="38"
+              font-family="Arial,sans-serif" font-size="9" fill="#fff" text-anchor="middle" letter-spacing="2">TV</text>
+          </svg>
+          <span class="client-name">Gokulam TV</span>
+        </div>
+        <div class="client-cell">
+          <svg width="100" height="46" viewBox="0 0 100 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="46" rx="4" fill="#e31b23" /><text x="50" y="22"
+              font-family="Arial Black,sans-serif" font-size="14" font-weight="900" fill="#fff"
+              text-anchor="middle">ZEE</text><text x="50" y="38" font-family="Arial,sans-serif" font-size="11"
+              fill="#ffcccc" text-anchor="middle">കേരളം</text>
+          </svg>
+          <span class="client-name">ZEE Keralam</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="46" viewBox="0 0 110 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="46" rx="4" fill="#fff3e0" />
+            <rect x="0" y="0" width="110" height="8" rx="4" fill="#ff6c00" />
+            <rect x="0" y="38" width="110" height="8" rx="4" fill="#ff6c00" /><text x="55" y="29"
+              font-family="Arial,sans-serif" font-size="9" font-weight="900" fill="#ff6c00" text-anchor="middle">ஆனந்த
+              விகடன்</text>
+          </svg>
+          <span class="client-name">Ananda Vikatan</span>
+        </div>
+        <div class="client-cell">
+          <svg width="80" height="46" viewBox="0 0 80 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="80" height="46" rx="4" fill="#ea1d63" /><text x="40" y="34" font-family="Georgia,serif"
+              font-size="28" font-weight="900" font-style="italic" fill="#fff" text-anchor="middle">g</text>
+          </svg>
+          <span class="client-name">Glam</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="50" viewBox="0 0 110 50" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="50" rx="4" fill="#1a1a1a" />
+            <polygon points="8,16 20,10 20,30 8,24" fill="#e63" /><text x="65" y="24"
+              font-family="Arial Black,sans-serif" font-size="8" font-weight="900" fill="#fff"
+              text-anchor="middle">BEHINDWOODS</text><text x="65" y="37" font-family="Arial,sans-serif" font-size="5.5"
+              fill="#888" text-anchor="middle">ENTERTAINING FOUR CRORE PEOPLE</text>
+          </svg>
+          <span class="client-name">Behindwoods</span>
+        </div>
+        <div class="client-cell">
+          <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Zee_Tamil_logo.svg" alt="ZEE Tamil">
+          <span class="client-name">ZEE தமிழ்</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="46" viewBox="0 0 110 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="46" rx="4" fill="#ff6600" />
+            <circle cx="55" cy="18" r="9" fill="#ffcc00" opacity="0.9" />
+            <line x1="35" y1="18" x2="75" y2="18" stroke="#ffcc00" stroke-width="2" /><text x="55" y="40"
+              font-family="Arial Black,sans-serif" font-size="9" font-weight="900" fill="#fff" text-anchor="middle"
+              letter-spacing="1">SUNRISERS</text>
+          </svg>
+          <span class="client-name">Sunrisers</span>
+        </div>
+        <div class="client-cell">
+          <svg width="100" height="46" viewBox="0 0 100 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="46" rx="4" fill="#1a2882" /><text x="50" y="22"
+              font-family="Arial Black,sans-serif" font-size="14" font-weight="900" fill="#fff"
+              text-anchor="middle">ZEE</text><text x="50" y="38" font-family="Arial,sans-serif" font-size="9"
+              fill="#c9a84c" text-anchor="middle">ಕನ್ನಡ</text>
+          </svg>
+          <span class="client-name">ZEE Kannada</span>
+        </div>
+        <div class="client-cell" style="visibility:hidden;background:#141414;border:none;"></div>
+        <div class="client-cell">
+          <svg width="100" height="46" viewBox="0 0 100 46" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="20" height="46" rx="0" fill="#e91e8c" />
+            <rect x="20" y="0" width="20" height="46" fill="#ff9800" />
+            <rect x="40" y="0" width="20" height="46" fill="#4caf50" />
+            <rect x="60" y="0" width="20" height="46" fill="#2196f3" />
+            <rect x="80" y="0" width="20" height="46" fill="#9c27b0" />
+            <rect x="8" y="14" width="84" height="18" rx="3" fill="rgba(0,0,0,0.75)" /><text x="50" y="27"
+              font-family="Arial Black,sans-serif" font-size="8.5" font-weight="900" fill="#fff"
+              text-anchor="middle">COLORS தமிழ்</text>
+          </svg>
+          <span class="client-name">Colors Tamil</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="50" viewBox="0 0 110 50" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="50" rx="4" fill="#1a0a00" />
+            <ellipse cx="30" cy="22" rx="14" ry="12" fill="#333" />
+            <circle cx="30" cy="13" r="7" fill="#444" />
+            <circle cx="27" cy="11" r="1.5" fill="#fff" />
+            <circle cx="33" cy="11" r="1.5" fill="#fff" /><text x="72" y="22" font-family="Arial Black,sans-serif"
+              font-size="8" font-weight="900" fill="#a0522d" text-anchor="middle">BLACK SHEEP</text><text x="72" y="36"
+              font-family="Arial,sans-serif" font-size="7.5" fill="#888" text-anchor="middle">DIGITAL</text>
+          </svg>
+          <span class="client-name">Black Sheep Digital</span>
+        </div>
+        <div class="client-cell">
+          <svg width="110" height="46" viewBox="0 0 110 46" xmlns="http://www.w3.org/2000/svg">
+            <rect width="110" height="46" rx="4" fill="#c0392b" /><text x="55" y="22" font-family="Arial,sans-serif"
+              font-size="10" font-weight="900" fill="#fff" text-anchor="middle">புதிய தலைமுறை</text>
+            <line x1="20" y1="28" x2="90" y2="28" stroke="rgba(255,255,255,0.3)" stroke-width="0.8" /><text x="55"
+              y="39" font-family="Arial,sans-serif" font-size="7" fill="#ffcccc" text-anchor="middle">PUTHIYA
+              THALAIMURAI</text>
+          </svg>
+          <span class="client-name">Puthiya Thalaimurai</span>
+        </div>
+        <div class="client-cell" style="visibility:hidden;background:#141414;border:none;"></div>
+        {% endif %}
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Renaissance Events India. All rights reserved.</p>
+    <a href="https://revents.in"
+      style="font-size:0.78rem;color:#c9a84c;text-decoration:none;letter-spacing:0.1em;">revents.in</a>
+  </footer>
+
+  <script>
+    // ── CURSOR ──────────────────────────────────────────
+    const dot = document.getElementById('curDot');
+    const ring = document.getElementById('curRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+    });
+    (function animRing() {
+      rx += (mx - rx) * .13; ry += (my - ry) * .13;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animRing);
+    })();
+    document.querySelectorAll('a,button,.partner-cell,.client-cell,.img-container,#menuCloseBtn').forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('hov'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('hov'));
+    });
+    document.addEventListener('mousedown', () => ring.classList.add('clk'));
+    document.addEventListener('mouseup', () => ring.classList.remove('clk'));
+
+    // ── NAV scroll ────────────────────────────────
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // ── Hamburger / mobile menu ───────────────────
+    const menuBtn = document.getElementById('hamBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuCloseBtn = document.getElementById('menuCloseBtn');
+
+    menuBtn.addEventListener('click', () => {
+      menuBtn.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+    menuCloseBtn.addEventListener('click', () => {
+      menuBtn.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        menuBtn.classList.remove('open');
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        menuBtn.classList.remove('open');
+        mobileMenu.classList.remove('open');
+      });
+    });
+
+    // ── Intersection Observer (scroll reveal) ─────
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => { entry.target.classList.add('visible'); }, 80);
+          revealObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(el => revealObs.observe(el));
+
+    // ── Client cells stagger ─────────────────────
+    const clientCells = document.querySelectorAll('.client-cell');
+    const cellObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const cells = entry.target.parentNode.querySelectorAll('.client-cell');
+          cells.forEach((cell, i) => {
+            setTimeout(() => {
+              cell.style.opacity = '1';
+              cell.style.transform = 'translateY(0)';
+            }, i * 30);
+          });
+          cellObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05 });
+
+    clientCells.forEach(cell => {
+      cell.style.opacity = '0';
+      cell.style.transform = 'translateY(20px)';
+      cell.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    });
+    if (clientCells[0]) cellObs.observe(clientCells[0]);
+
+    // ── Video modal ───────────────────────────────
+    const videoModal = document.getElementById('videoModal');
+    const videoFrame = document.getElementById('videoFrame');
+    const videoCloseBtn = document.getElementById('videoCloseBtn');
+
+    function openVideo(url) {
+      videoFrame.src = url + '?autoplay=1';
+      videoModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeVideo() {
+      videoModal.classList.remove('active');
+      videoFrame.src = '';
+      document.body.style.overflow = '';
+    }
+    videoCloseBtn.addEventListener('click', closeVideo);
+    videoModal.addEventListener('click', (e) => { if (e.target === videoModal) closeVideo(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeVideo(); });
+
+    // ── Keyboard nav for clients grid ────────────
+    let focusedCell = -1;
+    document.addEventListener('keydown', (e) => {
+      if (videoModal.classList.contains('active')) return;
+      const cells = Array.from(clientCells);
+      if (e.key === 'ArrowRight') { focusedCell = Math.min(focusedCell + 1, cells.length - 1); cells[focusedCell]?.focus(); }
+      else if (e.key === 'ArrowLeft') { focusedCell = Math.max(focusedCell - 1, 0); cells[focusedCell]?.focus(); }
+    });
+    clientCells.forEach((cell, i) => {
+      cell.setAttribute('tabindex', '0');
+      cell.addEventListener('focus', () => { focusedCell = i; });
+      cell.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { cell.style.outline = '2px solid #c9a84c'; setTimeout(() => cell.style.outline = '', 600); }
+      });
+    });
+  </script>
+</body>
+
+</html>
