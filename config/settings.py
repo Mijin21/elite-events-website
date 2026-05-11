@@ -27,8 +27,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-m1mbbz^6#*po2z@5+kunn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.2.107']
-# Application definition
+ALLOWED_HOSTS = ['elite-events-website-production.up.railway.app', 'localhost', '127.0.0.1']# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
