@@ -28,6 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-m1mbbz^6#*po2z@5+kunn
 DEBUG = True
 
 ALLOWED_HOSTS = ['elite-events-website-production.up.railway.app', 'localhost', '127.0.0.1']# Application definition
+CSRF_TRUSTED_ORIGINS = ['https://elite-events-website-production.up.railway.app']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
