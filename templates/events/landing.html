@@ -2063,8 +2063,7 @@
       <div class="gallery-grid reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
         {% if gallery_images %}
         {% for item in gallery_images %}
-        <div class="gal-item {% if item.video_id %}has-video{% endif %}" style="height:320px;" {% if item.video_id
-          %}onclick="openVideo('https://www.youtube.com/embed/{{ item.video_id }}')" {% endif %}>
+        <div class="gal-item {% if item.video_id %}has-video{% endif %}" style="height:320px;" {% if item.video_id %}onclick="openVideo('https://www.youtube.com/embed/{{ item.video_id }}')"{% endif %}>
           <img src="{{ item.image.url }}" alt="{{ item.name }}" style="height:100%;">
           {% if item.video_id %}
           <div class="play-badge"><svg viewBox="0 0 24 24">
