@@ -1834,7 +1834,8 @@
       </h1>
 
       <p class="hero-sub" id="heroSub">
-        {{ hero_content.subtitle|default:"From intimate gatherings to grand celebrations — every detail designed to perfection, every memory crafted with elegance." }}
+        {{ hero_content.subtitle|default:"From intimate gatherings to grand celebrations — every detail designed to
+        perfection, every memory crafted with elegance." }}
       </p>
 
       <div class="hero-btns" id="heroBtns">
@@ -2060,7 +2061,23 @@
       </div>
 
       <div class="gallery-grid reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
-
+        {% if gallery_images %}
+        {% for item in gallery_images %}
+        <div class="gal-item {% if item.video_id %}has-video{% endif %}" style="height:320px;" {% if item.video_id
+          %}onclick="openVideo('https://www.youtube.com/embed/{{ item.video_id }}')" {% endif %}>
+          <img src="{{ item.image.url }}" alt="{{ item.name }}" style="height:100%;">
+          {% if item.video_id %}
+          <div class="play-badge"><svg viewBox="0 0 24 24">
+              <polygon points="5,3 19,12 5,21" />
+            </svg></div>
+          {% endif %}
+          <div class="gal-overlay">
+            <span class="gal-cat">{{ item.category }}</span>
+            <span class="gal-title">{{ item.name }}</span>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
         <div class="gal-item has-video" style="height:320px;"
           onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
           <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=700&q=80" alt="CM Trophy"
@@ -2071,79 +2088,55 @@
           <div class="gal-overlay"><span class="gal-cat">Sports · 2025</span><span class="gal-title">CM Trophy
               2025</span></div>
         </div>
-
         <div class="gal-item" style="height:320px;">
           <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=700&q=80" alt="Gala Night"
             style="height:100%;">
           <div class="gal-overlay"><span class="gal-cat">Awards · 2024</span><span class="gal-title">Grand Gala
               Night</span></div>
         </div>
-
-        <div class="gal-item has-video" style="height:320px;"
-          onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+        <div class="gal-item" style="height:320px;">
           <img src="https://images.unsplash.com/photo-1506157786151-b8491531f063?w=700&q=80" alt="Cultural Fest"
             style="height:100%;">
-          <div class="play-badge"><svg viewBox="0 0 24 24">
-              <polygon points="5,3 19,12 5,21" />
-            </svg></div>
           <div class="gal-overlay"><span class="gal-cat">Ceremony · 2024</span><span class="gal-title">Cultural
               Festival</span></div>
         </div>
-
-        <div class="gal-item has-video" style="height:250px;"
-          onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+        <div class="gal-item" style="height:250px;">
           <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=700&q=80" alt="Corporate Summit"
             style="height:100%;">
-          <div class="play-badge"><svg viewBox="0 0 24 24">
-              <polygon points="5,3 19,12 5,21" />
-            </svg></div>
           <div class="gal-overlay"><span class="gal-cat">Corporate · 2025</span><span class="gal-title">GCC Next
               Summit</span></div>
         </div>
-
         <div class="gal-item" style="height:250px;">
           <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=700&q=80" alt="Jaipur Fest"
             style="height:100%;">
           <div class="gal-overlay"><span class="gal-cat">Ceremony · 2023</span><span class="gal-title">Jaipur Cultural
               Fest</span></div>
         </div>
-
-        <div class="gal-item has-video" style="height:250px;"
-          onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+        <div class="gal-item" style="height:250px;">
           <img src="https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=700&q=80" alt="iAW Awards"
             style="height:100%;">
-          <div class="play-badge"><svg viewBox="0 0 24 24">
-              <polygon points="5,3 19,12 5,21" />
-            </svg></div>
           <div class="gal-overlay"><span class="gal-cat">Awards · 2024</span><span class="gal-title">iAW Achievers
               Awards</span></div>
         </div>
-
         <div class="gal-item" style="height:280px;">
           <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=700&q=80" alt="Opening Ceremony"
             style="height:100%;">
           <div class="gal-overlay"><span class="gal-cat">Ceremony · 2024</span><span class="gal-title">Opening
               Ceremony</span></div>
         </div>
-
-        <div class="gal-item has-video" style="height:280px;"
-          onclick="openVideo('https://www.youtube.com/embed/dQw4w9WgXcQ')">
+        <div class="gal-item" style="height:280px;">
           <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=700&q=80" alt="Movie Launch"
             style="height:100%;">
-          <div class="play-badge"><svg viewBox="0 0 24 24">
-              <polygon points="5,3 19,12 5,21" />
-            </svg></div>
           <div class="gal-overlay"><span class="gal-cat">Film · 2024</span><span class="gal-title">Lal Salaam
               Launch</span></div>
         </div>
-
         <div class="gal-item" style="height:280px;">
           <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6?w=700&q=80" alt="Golden Jubilee"
             style="height:100%;">
           <div class="gal-overlay"><span class="gal-cat">Ceremony · 2023</span><span class="gal-title">Golden
               Jubilee</span></div>
         </div>
-
+        {% endif %}
       </div>
     </div>
   </section>
@@ -2348,7 +2341,8 @@
       <div class="testimonials-grid reveal" style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;">
         {% if testimonials %}
         {% for t in testimonials %}
-        <div class="testimonial-card" {% if forloop.counter == 2 %}style="border-color:rgba(201,168,76,.2);background:rgba(201,168,76,.03);" {% endif %}>
+        <div class="testimonial-card" {% if forloop.counter==2
+          %}style="border-color:rgba(201,168,76,.2);background:rgba(201,168,76,.03);" {% endif %}>
           <div class="testimonial-quote">★★★★★</div>
           <p class="testimonial-text">"{{ t.quote }}"</p>
           <div class="testimonial-author">
@@ -2417,7 +2411,10 @@
     <div style="display:flex;flex-direction:column;gap:1rem;align-items:flex-start;">
       <a href="tel:{{ contact_info.phone|default:'+91 98765 43210' }}" class="btn-primary"
         style="display:inline-block;"><span>{{ contact_info.phone|default:'+91 98765 43210' }}</span></a>
-      <a href="mailto:{{ contact_info.email|default:'hello@eliteevents.in' }}" style="font-size:.65rem;letter-spacing:.2em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color .3s;" onmouseover="this.style.color='var(--gold-light)'" onmouseout="this.style.color='var(--muted)'">{{ contact_info.email|default:'hello@eliteevents.in' }} →</a>
+      <a href="mailto:{{ contact_info.email|default:'hello@eliteevents.in' }}"
+        style="font-size:.65rem;letter-spacing:.2em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color .3s;"
+        onmouseover="this.style.color='var(--gold-light)'" onmouseout="this.style.color='var(--muted)'">{{
+        contact_info.email|default:'hello@eliteevents.in' }} →</a>
     </div>
   </div>
 
