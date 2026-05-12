@@ -139,3 +139,26 @@ class Client(models.Model):
 
     def __str__(self):
         return self.name
+class UpcomingEvent(models.Model):
+    title = models.CharField(max_length=200)
+    category = models.CharField(max_length=50)
+    description = models.TextField()
+    image = models.ImageField(upload_to='upcoming_events/', blank=True, null=True)
+    image_url = models.URLField(blank=True, help_text='External image URL (Unsplash etc)')
+    price_display = models.CharField(max_length=50, help_text='e.g. ₹5,00,000+')
+    event_date = models.DateField()
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order', 'event_date']
+
+    def __str__(self):
+        return f"{self.title} — {self.event_date}"
+
+    def get_image(self):
+        if self.image:
+            return self.image.url
+        elif self.image_url:
+            return self.image_url
+        return 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80'
