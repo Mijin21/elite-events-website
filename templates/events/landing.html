@@ -2417,14 +2417,7 @@
     <div style="display:flex;flex-direction:column;gap:1rem;align-items:flex-start;">
       <a href="tel:{{ contact_info.phone|default:'+91 98765 43210' }}" class="btn-primary"
         style="display:inline-block;"><span>{{ contact_info.phone|default:'+91 98765 43210' }}</span></a>
-      <a href="mailto:{{ contact_info.email|default:'hello@eliteevents.in' }}"
-        style="font-size:.65rem;letter-spacing:.2em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color .3s;"
-        onmouseover="this.style.color='var(--gold-light)'" onmouseout="this.style.color='var(--muted)'">{{
-        contact_info.email|default:'hello@eliteevents.in' }} →</a>
-      style="font-size:.65rem;letter-spacing:.2em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color
-      .3s;"
-      onmouseover="this.style.color='var(--gold-light)'" onmouseout="this.style.color='var(--muted)'">hello@revents.in
-      →</a>
+      <a href="mailto:{{ contact_info.email|default:'hello@eliteevents.in' }}" style="font-size:.65rem;letter-spacing:.2em;color:var(--muted);text-decoration:none;text-transform:uppercase;transition:color .3s;" onmouseover="this.style.color='var(--gold-light)'" onmouseout="this.style.color='var(--muted)'">{{ contact_info.email|default:'hello@eliteevents.in' }} →</a>
     </div>
   </div>
 
