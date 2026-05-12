@@ -161,7 +161,7 @@ def contact(request):
                 resend.api_key = os.environ.get('RESEND_API_KEY')
                 resend.Emails.send({
                     "from": "onboarding@resend.dev",
-                    "to": "mijinmijin21@gmail.com",
+                    "to": "mijinmijin74@gmail.com",
                     "subject": "✨ Thank you for contacting Elite Events!",
                     "html": html_message,
                 })
@@ -228,7 +228,7 @@ def booking(request):
             resend.api_key = os.environ.get('RESEND_API_KEY')
             resend.Emails.send({
                 "from": "onboarding@resend.dev",
-                "to": "mijinmijin21@gmail.com",
+                "to": "mijinmijin74@gmail.com",
                 "subject": "🎉 Your Booking is Confirmed @ Elite Events!",
                 "html": html_message,
             })
