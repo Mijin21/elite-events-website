@@ -6,7 +6,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import ContactEnquiry, EventBooking
-
+import resend
+import os
 def landing(request):
     import json
     from .models import SiteContent, SiteImage, Service, Testimonial
@@ -157,14 +158,13 @@ def contact(request):
                     'name': name, 'email': email,
                     'phone': phone, 'subject': subject, 'message': message,
                 })
-                send_mail(
-                    subject='✨ Thank you for contacting Elite Events!',
-                    message='',
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[email],
-                    html_message=html_message,
-                    fail_silently=False,
-                )
+                resend.api_key = os.environ.get('RESEND_API_KEY')
+                resend.Emails.send({
+                    "from": "onboarding@resend.dev",
+                    "to": email,
+                    "subject": "✨ Thank you for contacting Elite Events!",
+                    "html": html_message,
+                })
             except:
                 pass
     return render(request, 'events/contact.html', {'contact_info': contact_info})
@@ -225,14 +225,13 @@ def booking(request):
                 'event_type': event_type,
                 'event_date': event_date,
             })
-            send_mail(
-                subject='🎉 Your Booking is Confirmed – Elite Events!',
-                message='',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-                html_message=html_message,
-                fail_silently=False,
-            )
+            resend.api_key = os.environ.get('RESEND_API_KEY')
+            resend.Emails.send({
+                "from": "onboarding@resend.dev",
+                "to": email,
+                "subject": "🎉 Your Booking is Confirmed @ Elite Events!",
+                "html": html_message,
+            })
         except:
             pass
 
