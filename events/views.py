@@ -160,7 +160,7 @@ def contact(request):
                 send_mail(
                     subject='✨ Thank you for contacting Elite Events!',
                     message='',
-                    from_email=None,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[email],
                     html_message=html_message,
                     fail_silently=True,
@@ -228,7 +228,7 @@ def booking(request):
             send_mail(
                 subject='🎉 Your Booking is Confirmed – Elite Events!',
                 message='',
-                from_email=None,
+                from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[email],
                 html_message=html_message,
                 fail_silently=True,
