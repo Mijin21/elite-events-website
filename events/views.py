@@ -54,7 +54,8 @@ def landing(request):
         'stat3_num': get_content('hero_stat3_num', '20+'),
         'stat3_label': get_content('hero_stat3_label', 'Years Experience'),
     }
-
+    from .models import UpcomingEvent
+    upcoming_events = UpcomingEvent.objects.filter(is_active=True).order_by('order', 'event_date')
     return render(request, 'events/landing.html', {
         'hero_images': hero_images,
         'gallery_images': gallery_images,
@@ -62,6 +63,7 @@ def landing(request):
         'testimonials': testimonials,
         'contact_info': contact_info,
         'hero_content': hero_content,
+        'upcoming_events': upcoming_events,
     })
 def about(request):
     import json

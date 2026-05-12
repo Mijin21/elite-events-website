@@ -2228,98 +2228,37 @@
 
       <div style="display:flex;flex-direction:column;gap:2px;" id="eventListContainer" class="reveal">
 
-        <div class="event-list-card" data-title="Royal Wedding Extravaganza">
-          <img class="event-list-img" src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80"
-            alt="Wedding">
-          <div>
-            <div class="event-list-cat">Weddings</div>
-            <div class="event-list-title">Royal Wedding Extravaganza</div>
-            <p class="event-list-desc">Turn your dream wedding into reality with bespoke planning and luxurious décor.
-            </p>
-          </div>
-          <div>
-            <div class="event-list-price">₹5,00,000+</div>
-            <div class="event-list-date">May 15, 2026</div>
-            <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}"
-              class="btn-primary"
-              style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book
-                Now</span></a>
-          </div>
-        </div>
-
-        <div class="event-list-card" data-title="Corporate Leadership Summit">
-          <img class="event-list-img" src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=400&q=80"
-            alt="Corporate">
-          <div>
-            <div class="event-list-cat">Corporate</div>
-            <div class="event-list-title">Corporate Leadership Summit</div>
-            <p class="event-list-desc">Elevate your brand with impeccable conferences and galas that leave lasting
-              impressions.</p>
-          </div>
-          <div>
-            <div class="event-list-price">₹2,50,000+</div>
-            <div class="event-list-date">June 8, 2026</div>
-            <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}"
-              class="btn-primary"
-              style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book
-                Now</span></a>
-          </div>
-        </div>
-
-        <div class="event-list-card" data-title="Fun-Filled Birthday Celebration">
-          <img class="event-list-img" src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&q=80"
-            alt="Birthday">
-          <div>
-            <div class="event-list-cat">Social</div>
-            <div class="event-list-title">Fun-Filled Birthday Celebration</div>
-            <p class="event-list-desc">Celebrate with exciting themes, vibrant decorations, and engaging activities.</p>
-          </div>
-          <div>
-            <div class="event-list-price">₹75,000+</div>
-            <div class="event-list-date">April 28, 2026</div>
-            <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}"
-              class="btn-primary"
-              style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book
-                Now</span></a>
-          </div>
-        </div>
-
-        <div class="event-list-card" data-title="Elegant Product Launch">
-          <img class="event-list-img" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80"
-            alt="Launch">
-          <div>
-            <div class="event-list-cat">Corporate</div>
-            <div class="event-list-title">Elegant Product Launch</div>
-            <p class="event-list-desc">Cinematic product reveals with breathtaking stage design and AV production.</p>
-          </div>
-          <div>
-            <div class="event-list-price">₹3,00,000+</div>
-            <div class="event-list-date">July 12, 2026</div>
-            <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}"
-              class="btn-primary"
-              style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book
-                Now</span></a>
-          </div>
-        </div>
-
-        <div class="event-list-card" data-title="Grand Housewarming Ceremony">
-          <img class="event-list-img" src="https://images.unsplash.com/photo-1531058020387-3be344556be6?w=400&q=80"
-            alt="Housewarming">
-          <div>
-            <div class="event-list-cat">Social</div>
-            <div class="event-list-title">Grand Housewarming Ceremony</div>
-            <p class="event-list-desc">Make your new home truly special with traditional rituals and modern décor.</p>
-          </div>
-          <div>
-            <div class="event-list-price">₹50,000+</div>
-            <div class="event-list-date">May 3, 2026</div>
-            <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}"
-              class="btn-primary"
-              style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book
-                Now</span></a>
-          </div>
-        </div>
-
+        {% if upcoming_events %}
+  {% for event in upcoming_events %}
+  <div class="event-list-card" data-title="{{ event.title }}">
+    <img class="event-list-img" src="{{ event.get_image }}" alt="{{ event.title }}">
+    <div>
+      <div class="event-list-cat">{{ event.category }}</div>
+      <div class="event-list-title">{{ event.title }}</div>
+      <p class="event-list-desc">{{ event.description }}</p>
+    </div>
+    <div>
+      <div class="event-list-price">{{ event.price_display }}</div>
+      <div class="event-list-date">{{ event.event_date|date:"F d, Y" }}</div>
+      <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}" class="btn-primary" style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book Now</span></a>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="event-list-card" data-title="Royal Wedding Extravaganza">
+    <img class="event-list-img" src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&q=80" alt="Wedding">
+    <div>
+      <div class="event-list-cat">Weddings</div>
+      <div class="event-list-title">Royal Wedding Extravaganza</div>
+      <p class="event-list-desc">Turn your dream wedding into reality with bespoke planning and luxurious décor.</p>
+    </div>
+    <div>
+      <div class="event-list-price">₹5,00,000+</div>
+      <div class="event-list-date">May 15, 2026</div>
+      <a href="{% if user.is_authenticated %}{% url 'booking' %}{% else %}{% url 'login' %}?next={% url 'booking' %}{% endif %}" class="btn-primary" style="margin-top:.8rem;display:inline-block;padding:.5rem 1rem;font-size:.55rem;"><span>Book Now</span></a>
+    </div>
+  </div>
+{% endif %}
       </div>
     </div>
   </section>
