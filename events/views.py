@@ -853,3 +853,80 @@ def api_client_delete(request, pk):
         from .models import Client
         Client.objects.filter(pk=pk).delete()
         return JsonResponse({'success': True})
+# ── Upcoming Events API ───────────────────────────────────────
+@staff_member_required(login_url='/admin-panel/login/')
+def api_upcoming_events_list(request):
+    from .models import UpcomingEvent
+    events = UpcomingEvent.objects.all().order_by('order', 'event_date')
+    data = [{
+        'id': e.id,
+        'title': e.title,
+        'category': e.category,
+        'description': e.description,
+        'image_url': e.image_url,
+        'price_display': e.price_display,
+        'event_date': str(e.event_date),
+        'order': e.order,
+        'is_active': e.is_active,
+    } for e in events]
+    return JsonResponse({'events': data})
+
+@staff_member_required(login_url='/admin-panel/login/')
+def api_upcoming_event_detail(request, pk):
+    from .models import UpcomingEvent
+    try:
+        e = UpcomingEvent.objects.get(pk=pk)
+        return JsonResponse({
+            'id': e.id, 'title': e.title, 'category': e.category,
+            'description': e.description, 'image_url': e.image_url,
+            'price_display': e.price_display, 'event_date': str(e.event_date),
+            'order': e.order, 'is_active': e.is_active,
+        })
+    except UpcomingEvent.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+
+@staff_member_required(login_url='/admin-panel/login/')
+def api_upcoming_event_create(request):
+    if request.method == 'POST':
+        from .models import UpcomingEvent
+        import json as _json
+        data = _json.loads(request.body)
+        UpcomingEvent.objects.create(
+            title=data.get('title', ''),
+            category=data.get('category', ''),
+            description=data.get('description', ''),
+            image_url=data.get('image_url', ''),
+            price_display=data.get('price_display', ''),
+            event_date=data.get('event_date'),
+            order=data.get('order', 0),
+            is_active=data.get('is_active', True),
+        )
+        return JsonResponse({'success': True})
+
+@staff_member_required(login_url='/admin-panel/login/')
+def api_upcoming_event_update(request, pk):
+    if request.method == 'POST':
+        from .models import UpcomingEvent
+        import json as _json
+        try:
+            e = UpcomingEvent.objects.get(pk=pk)
+            data = _json.loads(request.body)
+            e.title = data.get('title', e.title)
+            e.category = data.get('category', e.category)
+            e.description = data.get('description', e.description)
+            e.image_url = data.get('image_url', e.image_url)
+            e.price_display = data.get('price_display', e.price_display)
+            e.event_date = data.get('event_date', e.event_date)
+            e.order = data.get('order', e.order)
+            e.is_active = data.get('is_active', e.is_active)
+            e.save()
+            return JsonResponse({'success': True})
+        except UpcomingEvent.DoesNotExist:
+            return JsonResponse({'error': 'Not found'}, status=404)
+
+@staff_member_required(login_url='/admin-panel/login/')
+def api_upcoming_event_delete(request, pk):
+    if request.method == 'DELETE':
+        from .models import UpcomingEvent
+        UpcomingEvent.objects.filter(pk=pk).delete()
+        return JsonResponse({'success': True})

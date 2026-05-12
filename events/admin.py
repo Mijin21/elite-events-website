@@ -1,9 +1,9 @@
 from django.contrib import admin
 from .models import (
     ContactEnquiry, EventBooking, Service, PortfolioItem,
-    Testimonial, TeamMember, SiteImage, SiteContent, SiteSetting, Client
+    Testimonial, TeamMember, SiteImage, SiteContent, SiteSetting, Client,
+    UpcomingEvent
 )
-
 @admin.register(ContactEnquiry)
 class ContactEnquiryAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'phone', 'submitted_at')
@@ -46,3 +46,9 @@ class SiteContentAdmin(admin.ModelAdmin):
 @admin.register(SiteSetting)
 class SiteSettingAdmin(admin.ModelAdmin):
     list_display = ('key', 'updated_at')
+@admin.register(UpcomingEvent)
+class UpcomingEventAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'event_date', 'price_display', 'order', 'is_active')
+    list_editable = ('order', 'is_active')
+    search_fields = ('title', 'category')
+    list_filter = ('category', 'is_active')
